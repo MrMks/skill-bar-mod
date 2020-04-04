@@ -1,0 +1,18 @@
+key.categories.skillbar=技能栏
+key.skillbar.hotkey_1=技能键 1
+key.skillbar.hotkey_2=技能键 2
+key.skillbar.hotkey_3=技能键 3
+key.skillbar.hotkey_4=技能键 4
+key.skillbar.hotkey_5=技能键 5
+key.skillbar.hotkey_6=技能键 6
+key.skillbar.hotkey_7=技能键 7
+key.skillbar.hotkey_8=技能键 8
+key.skillbar.hotkey_9=技能键 9
+key.skillbar.setting=技能栏设置
+key.skillbar.toggle=显示或隐藏
+
+gui.skillbar.title_own=已获得技能
+gui.skillbar.title_bar=已选择技能
+
+msg.skillbar.enable=技能栏已启用
+msg.skillbar.disable=技能栏已关闭

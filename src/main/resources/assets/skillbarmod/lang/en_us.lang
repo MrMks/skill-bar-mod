@@ -1,0 +1,18 @@
+key.categories.skillbar=Skill Bar
+key.skillbar.hotkey_1=Skill Key 1
+key.skillbar.hotkey_2=Skill Key 2
+key.skillbar.hotkey_3=Skill Key 3
+key.skillbar.hotkey_4=Skill Key 4
+key.skillbar.hotkey_5=Skill Key 5
+key.skillbar.hotkey_6=Skill Key 6
+key.skillbar.hotkey_7=Skill Key 7
+key.skillbar.hotkey_8=Skill Key 8
+key.skillbar.hotkey_9=Skill Key 9
+key.skillbar.setting=Skill Bar Setting
+key.skillbar.toggle=Show Or Hide
+
+gui.skillbar.title_own=Owned Skills
+gui.skillbar.title_bar=Selected Skills
+
+msg.skillbar.enable=Skill Bar Enabled
+msg.skillbar.disable=Skill Bar Disabled

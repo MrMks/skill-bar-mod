@@ -1,0 +1,7 @@
+[{
+    "modid": "skillbarmod",
+    "name": "SkillBar Mod",
+    "version": "${version}",
+    "authorList": ["MrMks"],
+    "description": "A mod that allow you to have another bar to place your SkillAPI skill, this will actually do nothing if you don't use SkillAPI. To enable this mod in game, you need to use my SkillBar plugin on server."
+}]
