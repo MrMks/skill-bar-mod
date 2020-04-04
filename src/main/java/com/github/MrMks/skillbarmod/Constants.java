@@ -16,15 +16,11 @@ public class Constants {
     public static final byte ADD_SKILL = 9;
     public static final byte LIST_BAR = 10;
     public static final byte SAVE_BAR = 11;
-    public static final byte STATUS = 12;
+    public static final byte DISCOVER = 12;
 
     public static final byte CAST_SUCCESS = 0;
     public static final byte CAST_FAILED_NO_SKILL = 1;
     public static final byte CAST_FAILED_UNLOCK = 2;
     public static final byte CAST_FAILED_COOLDOWN = 3;
     public static final byte CAST_FAILED_UNEXPECTED = 4;
-
-    public static final byte STATUS_ENABLE = 0;
-    public static final byte STATUS_DISABLE = 1;
-    //public static final byte STATUS_CLIENT_DISABLE = 2;
 }

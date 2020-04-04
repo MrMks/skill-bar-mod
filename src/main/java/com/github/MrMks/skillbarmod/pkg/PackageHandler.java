@@ -57,6 +57,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         if (buf != null){
             ByteDecoder dec = new ByteDecoder(buf);
             switch (dec.getHeader()){
+                case DISCOVER:
+                    onDiscover();
+                    break;
                 case ENABLE:
                     onEnable(dec);
                     break;
@@ -64,7 +67,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                     onAccount(dec);
                     break;
                 case DISABLE:
-                    onDisable(dec);
+                    onDisable();
                     break;
                 case ENFORCE_LIST_SKILL:
                     onEnforceListSkill(dec);
@@ -94,6 +97,10 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         return null;
     }
 
+    private void onDiscover(){
+        PackageSender.sendDiscover();
+    }
+
     private void onEnable(ByteDecoder dec){
         int activeId = dec.readInt();
         int skillSize = dec.readInt();
@@ -107,7 +114,6 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                 if (manager.isListBar()) PackageSender.sendListBar();
             }
         }
-        PackageSender.sendDiscover();
         Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString("\u00A72" + I18n.format("msg.skillbar.enable"))));
     }
 
@@ -123,7 +129,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         }
     }
 
-    private void onDisable(ByteDecoder dec){
+    private void onDisable(){
         if (Manager.isEnable()){
             Manager.setEnable(false);
             Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString("\u00A72" + I18n.format("msg.skillbar.disable"))));

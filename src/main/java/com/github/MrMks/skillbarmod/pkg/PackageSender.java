@@ -16,7 +16,7 @@ public class PackageSender {
     }
 
     public static void sendDiscover(){
-        ByteBuilder builder = new ForgeByteBuilder(Constants.ENABLE);
+        ByteBuilder builder = new ForgeByteBuilder(Constants.DISCOVER);
         send(builder.buildBuf());
     }
 
