@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 @SuppressWarnings("unused")
-@Mod(modid = "skillbarmod",name = "SkillBar Mod",version = "2", clientSideOnly = true)
+@Mod(modid = "skillbarmod",name = "SkillBar Mod",version = "3", clientSideOnly = true)
 public class SkillBarMod {
     @Mod.EventHandler
     public void postInit(FMLInitializationEvent e){
