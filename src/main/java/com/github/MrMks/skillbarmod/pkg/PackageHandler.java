@@ -114,7 +114,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                 if (manager.isListBar()) PackageSender.sendListBar();
             }
         }
-        Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString("\u00A72" + I18n.format("msg.skillbar.enable"))));
+        Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
     }
 
     private void onAccount(ByteDecoder dec){
@@ -132,7 +132,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     private void onDisable(){
         if (Manager.isEnable()){
             Manager.setEnable(false);
-            Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString("\u00A72" + I18n.format("msg.skillbar.disable"))));
+            Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.disable"))));
         }
     }
 
@@ -176,7 +176,23 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         String key = dec.readCharSequence().toString();
         boolean exist = dec.readBoolean();
         if (exist){
-            dec.readBoolean();
+            boolean suc = dec.readBoolean();
+            byte code = dec.read();
+            if (!suc){
+                Minecraft mc = Minecraft.getMinecraft();
+                switch (code) {
+                    case CAST_FAILED_NO_SKILL:
+                    case CAST_FAILED_UNLOCK:
+                        break;
+                    case CAST_FAILED_COOLDOWN:
+                        mc.addScheduledTask(()-> {
+                            String msg = I18n.format("msg.skillbar.fail_cd", Manager.getManager().getSkillDisplayName(key));
+                            mc.player.sendMessage(new TextComponentString(msg));
+                        });
+                        break;
+                    default:
+                }
+            }
         } else {
             Manager manager = Manager.getManager();
             if (manager.isActive()) manager.removeSkill(key);

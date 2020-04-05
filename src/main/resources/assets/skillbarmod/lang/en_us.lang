@@ -14,5 +14,7 @@ key.skillbar.toggle=Show Or Hide
 gui.skillbar.title_own=Owned Skills
 gui.skillbar.title_bar=Selected Skills
 
-msg.skillbar.enable=Skill Bar Enabled
-msg.skillbar.disable=Skill Bar Disabled
+msg.skillbar.enable=§2Skill Bar Enabled
+msg.skillbar.disable=§2Skill Bar Disabled
+
+msg.skillbar.fail_cd=§2Skill §6%s §2still in cooldown

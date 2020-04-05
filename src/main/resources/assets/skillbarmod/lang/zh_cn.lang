@@ -14,5 +14,7 @@ key.skillbar.toggle=显示或隐藏
 gui.skillbar.title_own=已获得技能
 gui.skillbar.title_bar=已选择技能
 
-msg.skillbar.enable=技能栏已启用
-msg.skillbar.disable=技能栏已关闭
+msg.skillbar.enable=§2技能栏已启用
+msg.skillbar.disable=§2技能栏已关闭
+
+msg.skillbar.fail_cd=§2技能 §6%s §2冷却中

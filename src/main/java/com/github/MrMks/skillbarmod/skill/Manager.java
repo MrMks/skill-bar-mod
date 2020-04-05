@@ -151,6 +151,15 @@ public class Manager {
         }
     }
 
+    public String getSkillDisplayName(String key){
+        SkillInfo info = skillMap.get(key);
+        if (info == null) return key;
+        else {
+            String name = info.getIcon().getDisplayName();
+            return name.substring(2,name.lastIndexOf("=") - 4);
+        }
+    }
+
     /**
      *
      * @param nMap new map in selected bar
