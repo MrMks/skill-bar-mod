@@ -1,4 +1,4 @@
-package com.github.MrMks.skillbarmod;
+package com.github.MrMks.skillbarmod.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;

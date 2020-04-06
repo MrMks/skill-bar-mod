@@ -1,7 +1,8 @@
 package com.github.MrMks.skillbarmod.pkg;
 
-import com.github.MrMks.skillbarmod.ByteDecoder;
-import com.github.MrMks.skillbarmod.PartMerge;
+import com.github.MrMks.skillbarmod.common.ByteDecoder;
+import com.github.MrMks.skillbarmod.common.Constants;
+import com.github.MrMks.skillbarmod.common.PartMerge;
 import com.github.MrMks.skillbarmod.skill.Manager;
 import com.github.MrMks.skillbarmod.skill.SkillInfo;
 import io.netty.buffer.ByteBuf;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.MrMks.skillbarmod.Constants.*;
+import static com.github.MrMks.skillbarmod.common.Constants.*;
 
 /**
  * This class response to handle messages from server plugin;
@@ -58,7 +59,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
             ByteDecoder dec = new ByteDecoder(buf);
             switch (dec.getHeader()){
                 case DISCOVER:
-                    onDiscover();
+                    onDiscover(dec);
                     break;
                 case ENABLE:
                     onEnable(dec);
@@ -97,8 +98,8 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         return null;
     }
 
-    private void onDiscover(){
-        PackageSender.sendDiscover();
+    private void onDiscover(ByteDecoder dec){
+        if (dec.readInt() == Constants.VERSION) PackageSender.sendDiscover();
     }
 
     private void onEnable(ByteDecoder dec){

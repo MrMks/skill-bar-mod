@@ -1,6 +1,6 @@
 package com.github.MrMks.skillbarmod.pkg;
 
-import com.github.MrMks.skillbarmod.ByteBuilder;
+import com.github.MrMks.skillbarmod.common.ByteBuilder;
 import io.netty.buffer.ByteBuf;
 
 public class ForgeByteBuilder extends ByteBuilder {

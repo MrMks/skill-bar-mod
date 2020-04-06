@@ -1,6 +1,8 @@
-package com.github.MrMks.skillbarmod;
+package com.github.MrMks.skillbarmod.common;
 
 public class Constants {
+    public static final int VERSION = 2;
+
     public static final String CHANNEL_NAME = "MCG_SkillBar";
     public static final byte DISCRIMINATOR = 0;
 

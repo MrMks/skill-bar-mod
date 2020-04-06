@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbarmod;
 
+import com.github.MrMks.skillbarmod.common.Constants;
 import com.github.MrMks.skillbarmod.gui.GuiHandler;
 import com.github.MrMks.skillbarmod.listener.KeyListener;
 import com.github.MrMks.skillbarmod.listener.MainListener;
