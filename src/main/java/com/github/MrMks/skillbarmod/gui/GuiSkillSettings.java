@@ -12,6 +12,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 
@@ -126,9 +127,16 @@ public class GuiSkillSettings extends GuiContainer {
         if (keyCode == 1 || keyCode == KeyManager.getSettingKey().getKeyCode())
         {
             this.mc.player.closeScreen();
+        } else if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9){
+            int targetId = keyCode - Keyboard.KEY_1 + 36;
+            Slot slot = getSlotUnderMouse();
+            if (slot != null){
+                Slot targetSlot = this.mc.player.openContainer.getSlot(targetId);
+                if (!this.mc.player.inventory.getItemStack().isEmpty()) handleMouseClick(slot,slot.slotNumber,1,ClickType.PICKUP);
+                handleMouseClick(slot,slot.slotNumber,0,ClickType.PICKUP);
+                handleMouseClick(targetSlot,targetSlot.slotNumber,0,ClickType.PICKUP);
+            }
         }
-
-        this.checkHotbarKeys(keyCode);
     }
 
     @Override

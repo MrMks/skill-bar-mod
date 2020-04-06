@@ -127,4 +127,8 @@ public class ContainerSkillSetting extends Container {
         while(i < 36) full.setStackInSlot(i++, ItemStack.EMPTY);
     }
 
+    @Override
+    public boolean canMergeSlot(ItemStack stack, Slot slotIn) {
+        return false;
+    }
 }
