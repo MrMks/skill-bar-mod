@@ -28,7 +28,7 @@ public class Manager {
 
     public static Manager getManager(int id){
         synchronized (map) {
-            return (id < 0 || !enable.get()) ? null : map.getOrDefault(id, null);
+            return (id < 0 || !enable.get()) ? empty : map.getOrDefault(id, empty);
         }
     }
 
@@ -43,7 +43,6 @@ public class Manager {
     public static void setActiveId(int id){
         activeId.set(id);
         if (id < 0) enable.set(false);
-        else if (!map.containsKey(id)) map.put(id, new Manager(id));
     }
 
     public static int getActiveId(){

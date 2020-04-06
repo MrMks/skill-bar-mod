@@ -108,10 +108,10 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         synchronized (manager = Manager.prepareManager(activeId)) {
             if (manager.getId() < 0) Manager.setActiveId(-1); //this should never happen as account id is only allowed to be 1 to n;
             else {
-                Manager.setActiveId(activeId);
                 Manager.setEnable(true);
                 if (manager.isListSkill(skillSize)) PackageSender.sendListSkill(manager.getSkillKeyList());
                 if (manager.isListBar()) PackageSender.sendListBar();
+                Manager.setActiveId(activeId);
             }
         }
         Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
@@ -121,9 +121,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         int activeId = dec.readInt();
         int skillSize = dec.readInt();
         Manager manager;
+        Manager.setActiveId(activeId);
         synchronized (manager = Manager.prepareManager(activeId)){
             if (!manager.isActive()) return;
-            Manager.setActiveId(activeId);
             if (manager.isListSkill(skillSize)) PackageSender.sendListSkill(manager.getSkillKeyList());
             if (manager.isListBar()) PackageSender.sendListBar();
         }
@@ -169,7 +169,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         int activeId = dec.readInt();
         SkillInfo info = readSkillInfo(dec);
         Manager manager = Manager.getManager(activeId);
-        if (manager != null) manager.addSkill(info);
+        if (manager != null && manager.getId() > 0) manager.addSkill(info);
     }
 
     private void onCast(ByteDecoder dec){
