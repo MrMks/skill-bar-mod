@@ -175,28 +175,21 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     private void onCast(ByteDecoder dec){
         String key = dec.readCharSequence().toString();
-        boolean exist = dec.readBoolean();
-        if (exist){
-            boolean suc = dec.readBoolean();
-            byte code = dec.read();
-            if (!suc){
-                Minecraft mc = Minecraft.getMinecraft();
-                switch (code) {
-                    case CAST_FAILED_NO_SKILL:
-                    case CAST_FAILED_UNLOCK:
-                        break;
-                    case CAST_FAILED_COOLDOWN:
-                        mc.addScheduledTask(()-> {
-                            String msg = I18n.format("msg.skillbar.fail_cd", Manager.getManager().getSkillDisplayName(key));
-                            mc.player.sendMessage(new TextComponentString(msg));
-                        });
-                        break;
-                    default:
-                }
+        boolean suc = dec.readBoolean();
+        byte code = dec.read();
+        if (!suc){
+            Minecraft mc = Minecraft.getMinecraft();
+            switch (code) {
+                case CAST_FAILED_NO_SKILL:
+                    Manager manager = Manager.getManager();
+                    if (manager.isActive()) manager.removeSkill(key);
+                    break;
+                case CAST_FAILED_UNLOCK:
+                    break;
+                case CAST_FAILED_COOLDOWN:
+                    break;
+                default:
             }
-        } else {
-            Manager manager = Manager.getManager();
-            if (manager.isActive()) manager.removeSkill(key);
         }
     }
 
