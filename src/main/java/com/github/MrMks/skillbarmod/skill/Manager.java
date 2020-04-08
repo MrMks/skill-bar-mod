@@ -164,7 +164,7 @@ public class Manager {
      * @param nMap new map in selected bar
      * @return true if nMap have difference form barMap;
      */
-    public boolean setBarMap(HashMap<Integer, String> nMap){
+    public boolean setBarMap(Map<Integer, String> nMap){
         if (isEmpty()) return false;
         synchronized (barMap){
             boolean flag = barMap.size() == nMap.size();
@@ -182,6 +182,24 @@ public class Manager {
         }
     }
 
+    public boolean setBarMap(HashMap<Integer, String> nMap, int line){
+        if (isEmpty()) return false;
+        synchronized (barMap){
+            boolean flag = barMap.size() == nMap.size();
+            if (flag){
+                for (HashMap.Entry<Integer, String> entry : nMap.entrySet()){
+                    flag = entry.getValue().equals(barMap.getOrDefault(entry.getKey(), ""));
+                    if (!flag) break;
+                }
+            }
+            if (!flag){
+                for (int i = 0; i < 9; i++) map.remove(i + line * 9);
+                barMap.putAll(nMap);
+            }
+            return !flag;
+        }
+    }
+
     public String getKeyInBar(int i) {
         if (isEmpty()) return null;
         synchronized (barMap){
@@ -189,50 +207,52 @@ public class Manager {
         }
     }
 
-    private ArrayList<ItemStack> rIconList = new ArrayList<>(Collections.nCopies(9,ItemStack.EMPTY));
-    public synchronized ArrayList<ItemStack> getBarIconList(){
-        Collections.fill(rIconList,ItemStack.EMPTY);
-        if (isEmpty()) return rIconList;
+    public synchronized Map<Integer, ItemStack> getBarIconMap(){
+        Map<Integer, ItemStack> rIconMap = new HashMap<>();
+        if (isEmpty()) return rIconMap;
         ArrayList<Integer> list = new ArrayList<>(9);
-        for (HashMap.Entry<Integer, String> entry : barMap.entrySet()){
-            if (!skillMap.containsKey(entry.getValue())){
-                list.add(entry.getKey());
-                iconCache.remove(entry.getValue());
+        for (Map.Entry<Integer, String> entry : barMap.entrySet()){
+            int index = entry.getKey();
+            if (!barMap.containsKey(index)) continue;
+            String key = entry.getValue();
+            if (!skillMap.containsKey(key)){
+                list.add(index);
+                iconCache.remove(key);
                 continue;
             }
-            ItemStack icon = iconCache.get(entry.getValue());
+            ItemStack icon = iconCache.get(key);
             if (icon != null){
                 if (icon.getTagCompound() == null || !icon.hasTagCompound()) {
                     icon = null;
-                    iconCache.remove(entry.getValue());
+                    iconCache.remove(key);
                 }
                 else if (!icon.getTagCompound().hasKey("key")) {
-                    icon.setTagInfo("key", new NBTTagString(entry.getValue()));
+                    icon.setTagInfo("key", new NBTTagString(key));
                 }
             }
             if (icon == null){
-                SkillInfo info = skillMap.get(entry.getValue());
+                SkillInfo info = skillMap.get(key);
                 if (info != null){
                     icon = info.getIcon().copy();
                     if (icon.hasTagCompound() && icon.getTagCompound() != null){
-                        icon.setTagInfo("key", new NBTTagString(entry.getValue()));
+                        icon.setTagInfo("key", new NBTTagString(key));
                     } else {
                         icon = null;
                     }
                 }
             }
             if (icon != null){
-                int cd = cdMap.getOrDefault(entry.getValue(), 0) + 1;
+                int cd = cdMap.getOrDefault(key, 0) + 1;
                 if (cd == 1) {
-                    cdMap.remove(entry.getValue());
+                    cdMap.remove(key);
                 }
                 icon.setCount(cd);
-                iconCache.put(entry.getValue(), icon);
-                rIconList.set(entry.getKey(), icon);
+                iconCache.put(key, icon);
+                rIconMap.put(index, icon);
             }
         }
         for (Integer o : list) barMap.remove(o);
-        return rIconList;
+        return rIconMap;
     }
 
     public boolean isListBar(){
@@ -264,5 +284,9 @@ public class Manager {
         barMap.clear();
         cdMap.clear();
         iconCache.clear();
+    }
+
+    public Map<Integer, String> getBarMap() {
+        return new HashMap<>(barMap);
     }
 }

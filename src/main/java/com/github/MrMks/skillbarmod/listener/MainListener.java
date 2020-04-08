@@ -3,8 +3,11 @@ package com.github.MrMks.skillbarmod.listener;
 import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.gui.GuiSkillBar;
 import com.github.MrMks.skillbarmod.skill.Manager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -15,6 +18,18 @@ public class MainListener {
         this.setting = setting;
     }
 
+    // handle playerDisconnect when player is disconnected by channel close but did not receive disconnect package
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onWorldUnload(WorldEvent.Unload event){
+        NetHandlerPlayClient client = Minecraft.getMinecraft().getConnection();
+        if (client == null || !client.getNetworkManager().isChannelOpen()) {
+            if (!setting.isShow()) setting.toggle();
+            GuiSkillBar.clean();
+            Manager.clean();
+        }
+    }
+
+    // handle playerDisconnect
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPlayerDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
         if (!setting.isShow()) setting.toggle();
@@ -22,6 +37,7 @@ public class MainListener {
         Manager.clean();
     }
 
+    // render Skill Bar
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderOverlay(RenderGameOverlayEvent.Post e){
         if (e.isCancelable() && e.isCanceled()) return;
@@ -30,11 +46,12 @@ public class MainListener {
         if (e.getType() == RenderGameOverlayEvent.ElementType.HOTBAR){
             Manager manager = Manager.getManager();
             if (manager.isActive()) {
-                GuiSkillBar.getInstance(manager).render(e.getResolution());
+                GuiSkillBar.getInstance(manager, setting.getBarPage(), setting.getMaxBarPage()).render(e.getResolution());
             } else GuiSkillBar.clean();
         }
     }
 
+    // translate overlays
     private boolean translated;
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderTranslate(RenderGameOverlayEvent.Pre e){

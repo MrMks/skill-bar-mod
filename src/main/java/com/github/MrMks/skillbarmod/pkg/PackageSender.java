@@ -43,7 +43,7 @@ public class PackageSender {
         send(builder.buildBuf());
     }
 
-    public static void sendSaveBar(int id, HashMap<Integer, String> map){
+    public static void sendSaveBar(int id, Map<Integer, String> map){
         ByteBuilder builder = new ForgeByteBuilder(Constants.SAVE_BAR);
         builder.writeInt(id)
                 .writeInt(map.size());

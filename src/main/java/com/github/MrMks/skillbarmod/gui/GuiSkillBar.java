@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbarmod.gui;
 
+import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.KeyManager;
 import com.github.MrMks.skillbarmod.skill.Manager;
 import net.minecraft.client.Minecraft;
@@ -13,26 +14,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GuiSkillBar extends GuiIngame {
-    public static GuiSkillBar instance;
-
     private static GuiSkillBar nInstance = new GuiSkillBar();
-    public static synchronized GuiSkillBar getInstance(Manager manager){
+    public static synchronized GuiSkillBar getInstance(Manager manager, int page, int max){
         if (manager != null && manager.isActive()) {
-            nInstance.init(manager);
+            nInstance.init(manager, page, max);
             return nInstance;
         } else return null;
     }
 
     public static void clean(){
-        if (instance != null){
-            if (instance.ics != null) instance.ics.clear();
-            instance.ics = null;
+        if (nInstance != null){
+            if (nInstance.ics != null) nInstance.ics.clear();
         }
-        instance = null;
     }
 
     private static final String TEXTURE_PATH = "minecraft:textures/gui/widgets.png";
@@ -47,17 +45,34 @@ public class GuiSkillBar extends GuiIngame {
         this.zLevel = -100.0f;
     }
 
-    private List<ItemStack> ics;
-    private void init(@Nonnull Manager manager){
-        if (manager.isActive()) ics = manager.getBarIconList();
-        else ics = Collections.emptyList();
+    private List<ItemStack> ics = new ArrayList<>();
+    private String pageStr;
+    private void init(@Nonnull Manager manager, int page, int max){
+        if (manager.isActive()) {
+            ics.clear();
+            Map<Integer, ItemStack> map = manager.getBarIconMap();
+            for (int i = 0; i < 9; i++){
+                ics.add(map.getOrDefault(i + page * 9, ItemStack.EMPTY));
+            }
+        }
+        else ics.clear();
+        pageStr = String.format("(%d/%d)",page + 1, max + 1);
     }
 
     public void render(ScaledResolution sr){
         GlStateManager.pushMatrix();
         this.renderBackground(sr);
         this.renderItemStacks(sr);
+        this.renderForeground(sr);
         GlStateManager.popMatrix();
+    }
+
+    private void renderForeground(ScaledResolution sr) {
+        if (sr == null) return;
+        int x = sr.getScaledWidth() / 2 -  91 - fr.getStringWidth(pageStr) - 2;
+        int y = sr.getScaledHeight() - 43 + 10 - fr.FONT_HEIGHT / 2;
+
+        fr.drawStringWithShadow(pageStr, x, y, 0xDAA520);
     }
 
     private void renderBackground(ScaledResolution sr){

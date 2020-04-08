@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class SkillBarMod {
     @Mod.EventHandler
     public void postInit(FMLInitializationEvent e){
-        GameSetting setting = new GameSetting();
+        GameSetting setting = GameSetting.getInstance();
         MinecraftForge.EVENT_BUS.register(new MainListener(setting));
         MinecraftForge.EVENT_BUS.register(new KeyListener(this,setting));
         SimpleNetworkWrapper wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.CHANNEL_NAME);

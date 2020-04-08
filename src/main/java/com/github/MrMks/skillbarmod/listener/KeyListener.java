@@ -24,6 +24,8 @@ public class KeyListener {
         }
         ClientRegistry.registerKeyBinding(KeyManager.getSettingKey());
         ClientRegistry.registerKeyBinding(KeyManager.getToggleKey());
+        ClientRegistry.registerKeyBinding(KeyManager.getBarPageUpKey());
+        ClientRegistry.registerKeyBinding(KeyManager.getBarPageDownKey());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -34,11 +36,15 @@ public class KeyListener {
             setting.toggle();
         } else if (KeyManager.getSettingKey().isPressed()){
             Minecraft.getMinecraft().player.openGui(mod,2,Minecraft.getMinecraft().player.world,0,0,0);
+        } else if (KeyManager.getBarPageUpKey().isPressed()) {
+            setting.setBarPage(setting.getBarPage() - 1);
+        } else if (KeyManager.getBarPageDownKey().isPressed()) {
+            setting.setBarPage(setting.getBarPage() + 1);
         } else {
             List<KeyBinding> keys = KeyManager.getHotKeys();
             for (int i = 0; i < 9; i ++){
                 if (keys.get(i).isPressed()){
-                    String key = manager.getKeyInBar(i);
+                    String key = manager.getKeyInBar(i + setting.getBarPage() * 9);
                     if (key != null && !key.isEmpty()) {
                         PackageSender.sendCast(key);
                         break;

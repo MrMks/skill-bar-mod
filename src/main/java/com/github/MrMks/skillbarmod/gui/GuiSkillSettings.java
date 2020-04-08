@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbarmod.gui;
 
+import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.KeyManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -24,6 +25,8 @@ public class GuiSkillSettings extends GuiContainer {
 
     private static final int BUTTON_UP = 0;
     private static final int BUTTON_DOWN = 1;
+    private static final int BAR_BUTTON_UP = 2;
+    private static final int BAR_BUTTON_DOWN = 3;
 
     private ContainerSkillSetting containerSkill;
 
@@ -84,6 +87,52 @@ public class GuiSkillSettings extends GuiContainer {
                 }
             }
         });
+        this.buttonList.add(new GuiButton(BAR_BUTTON_UP, offsetX + 132, offsetY + 90, 19, 12, "")
+        {
+            @Override
+            public void drawButton(Minecraft mc, int mouseX, int mouseY,float sd)
+            {
+                if (this.visible)
+                {
+                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+                    mc.getTextureManager().bindTexture(TEXTURE);
+
+                    int x = mouseX - this.x, y = mouseY - this.y;
+
+                    if (x >= 0 && y >= 0 && x < this.width && y < this.height)
+                    {
+                        this.drawTexturedModalRect(this.x, this.y, 176, 12, this.width, this.height);
+                    }
+                    else
+                    {
+                        this.drawTexturedModalRect(this.x, this.y, 176, 0, this.width, this.height);
+                    }
+                }
+            }
+        });
+        this.buttonList.add(new GuiButton(BAR_BUTTON_DOWN, offsetX + 151, offsetY + 90, 19, 12, "")
+        {
+            @Override
+            public void drawButton(Minecraft mc, int mouseX, int mouseY, float sd)
+            {
+                if (this.visible)
+                {
+                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+
+                    mc.getTextureManager().bindTexture(TEXTURE);
+                    int x = mouseX - this.x, y = mouseY - this.y;
+
+                    if (x >= 0 && y >= 0 && x < this.width && y < this.height)
+                    {
+                        this.drawTexturedModalRect(this.x, this.y, 195, 12, this.width, this.height);
+                    }
+                    else
+                    {
+                        this.drawTexturedModalRect(this.x, this.y, 195, 0, this.width, this.height);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -95,9 +144,9 @@ public class GuiSkillSettings extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        String title_own = I18n.format("gui.skillbar.title_own");
+        String title_own = I18n.format("gui.skillbar.title_own") + String.format("(%d/%d)",containerSkill.getPageNow()+1,containerSkill.getPageMax() + 1);
         this.fontRenderer.drawString(title_own, 6,8,0x404040);
-        String title_bar = I18n.format("gui.skillbar.title_bar");
+        String title_bar = I18n.format("gui.skillbar.title_bar") + String.format("(%d/%d)",containerSkill.getBarPageNow()+1, containerSkill.getBarPageMax() + 1);
         this.fontRenderer.drawString(title_bar,6,92,0x404040);
     }
 
@@ -148,6 +197,12 @@ public class GuiSkillSettings extends GuiContainer {
                 break;
             case BUTTON_DOWN:
                 containerSkill.pageDown();
+                break;
+            case BAR_BUTTON_UP:
+                containerSkill.barPageUp();
+                break;
+            case BAR_BUTTON_DOWN:
+                containerSkill.barPageDown();
                 break;
         }
     }

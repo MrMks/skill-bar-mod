@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbarmod.pkg;
 
+import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.common.ByteDecoder;
 import com.github.MrMks.skillbarmod.common.Constants;
 import com.github.MrMks.skillbarmod.common.PartMerge;
@@ -64,6 +65,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                 case ENABLE:
                     onEnable(dec);
                     break;
+                case SETTING:
+                    onSetting(dec);
+                    break;
                 case ACCOUNT:
                     onAccount(dec);
                     break;
@@ -100,6 +104,10 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     private void onDiscover(ByteDecoder dec){
         if (dec.readInt() == Constants.VERSION) PackageSender.sendDiscover();
+    }
+
+    private void onSetting(ByteDecoder dec){
+        GameSetting.getInstance().setMaxBarPage(dec.readInt());
     }
 
     private void onEnable(ByteDecoder dec){
