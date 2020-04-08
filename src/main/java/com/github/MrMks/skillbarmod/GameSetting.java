@@ -1,20 +1,34 @@
 package com.github.MrMks.skillbarmod;
 
+/**
+ * This class is response to save all gaming settings;
+ */
 public class GameSetting {
     private static GameSetting instance = new GameSetting();
     public static GameSetting getInstance(){
         return instance;
     }
+    public static void clean(){
+        instance = null;
+        instance = new GameSetting();
+    }
 
+    /**
+     * should or not render {@link com.github.MrMks.skillbarmod.gui.GuiSkillBar} overlay;
+     */
     private boolean show = true;
     public void toggle(){
         show = !show;
     }
 
-    public boolean isShow() {
-        return show;
+    public boolean isHide() {
+        return !show;
     }
 
+    /**
+     * how many line of bar is active;
+     * Mainly used in {@link com.github.MrMks.skillbarmod.gui.ContainerSkillSetting}, {@link com.github.MrMks.skillbarmod.gui.GuiSkillBar} and {@link com.github.MrMks.skillbarmod.gui.GuiSkillSettings};
+     */
     private int barPage = 0;
     private int maxPage = 2;
     public void setBarPage(int nP){

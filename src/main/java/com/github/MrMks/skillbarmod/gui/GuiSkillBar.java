@@ -19,30 +19,18 @@ import java.util.List;
 import java.util.Map;
 
 public class GuiSkillBar extends GuiIngame {
-    private static GuiSkillBar nInstance = new GuiSkillBar();
-    public static synchronized GuiSkillBar getInstance(Manager manager, int page, int max){
-        if (manager != null && manager.isActive()) {
-            nInstance.init(manager, page, max);
-            return nInstance;
-        } else return null;
-    }
-
-    public static void clean(){
-        if (nInstance != null){
-            if (nInstance.ics != null) nInstance.ics.clear();
-        }
-    }
-
     private static final String TEXTURE_PATH = "minecraft:textures/gui/widgets.png";
     private static final ResourceLocation TEXTURE = new ResourceLocation(TEXTURE_PATH);
 
     private FontRenderer fr;
     private RenderItem ir;
-    public GuiSkillBar(){
+    public GuiSkillBar(Manager manager, GameSetting setting){
         super(Minecraft.getMinecraft());
         fr = getFontRenderer();
         ir = mc.getRenderItem();
         this.zLevel = -100.0f;
+
+        init(manager, setting.getBarPage(), setting.getMaxBarPage());
     }
 
     private List<ItemStack> ics = new ArrayList<>();

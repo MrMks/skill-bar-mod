@@ -23,8 +23,7 @@ public class MainListener {
     public void onWorldUnload(WorldEvent.Unload event){
         NetHandlerPlayClient client = Minecraft.getMinecraft().getConnection();
         if (client == null || !client.getNetworkManager().isChannelOpen()) {
-            if (!setting.isShow()) setting.toggle();
-            GuiSkillBar.clean();
+            if (setting.isHide()) setting.toggle();
             Manager.clean();
         }
     }
@@ -32,8 +31,7 @@ public class MainListener {
     // handle playerDisconnect
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPlayerDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
-        if (!setting.isShow()) setting.toggle();
-        GuiSkillBar.clean();
+        GameSetting.clean();
         Manager.clean();
     }
 
@@ -41,13 +39,13 @@ public class MainListener {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderOverlay(RenderGameOverlayEvent.Post e){
         if (e.isCancelable() && e.isCanceled()) return;
-        if (!setting.isShow()) return;
+        if (setting.isHide()) return;
 
         if (e.getType() == RenderGameOverlayEvent.ElementType.HOTBAR){
             Manager manager = Manager.getManager();
             if (manager.isActive()) {
-                GuiSkillBar.getInstance(manager, setting.getBarPage(), setting.getMaxBarPage()).render(e.getResolution());
-            } else GuiSkillBar.clean();
+                new GuiSkillBar(manager, setting).render(e.getResolution());
+            }
         }
     }
 
@@ -55,7 +53,7 @@ public class MainListener {
     private boolean translated;
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderTranslate(RenderGameOverlayEvent.Pre e){
-        if (!Manager.isEnable() || translated || !setting.isShow()) return;
+        if (!Manager.isEnable() || translated || setting.isHide()) return;
         RenderGameOverlayEvent.ElementType type = e.getType();
         boolean flag = type == RenderGameOverlayEvent.ElementType.HEALTH
                 || type == RenderGameOverlayEvent.ElementType.FOOD

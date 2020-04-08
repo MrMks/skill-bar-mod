@@ -3,6 +3,7 @@ package com.github.MrMks.skillbarmod.gui;
 import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.pkg.PackageSender;
 import com.github.MrMks.skillbarmod.skill.Manager;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -12,33 +13,29 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class ContainerSkillSetting extends Container {
     private ItemStackHandler full = new ItemStackHandler(36);
     private ItemStackHandler slc = new ItemStackHandler(9);
     private int pageNow = 0;
     private int barPageNow = 0;
-    private int barPageMax = 0;
+    private int barPageMax;
     private List<ItemStack> enabled;
     private Map<Integer, String> map;
     private Map<Integer, ItemStack> iconMap;
     private Manager manager;
 
     public ContainerSkillSetting(Manager manager, GameSetting setting){
-        init(manager);
-        barPageMax = setting.getMaxBarPage();
-    }
-
-    @Override
-    public boolean canInteractWith(EntityPlayer playerIn) {
-        return true;
-    }
-
-    private void init(Manager manager){
+        this.manager = manager;
         this.enabled = manager.getShowSkillList();
+        this.map = manager.getBarMap();
         this.iconMap = manager.getBarIconMap();
+        this.barPageMax = setting.getMaxBarPage();
         listToFull();
         listToSlc();
         int i;
@@ -50,8 +47,11 @@ public class ContainerSkillSetting extends Container {
         for (i = 0; i < 9; i++){
             this.addSlotToContainer(new SlotItemHandler(slc, i , 8 + i * 18, 104));
         }
-        this.manager = manager;
-        this.map = manager.getBarMap();
+    }
+
+    @Override
+    public boolean canInteractWith(EntityPlayer playerIn) {
+        return true;
     }
 
     @Override
@@ -95,28 +95,35 @@ public class ContainerSkillSetting extends Container {
     }
 
     public void pageUp(){
-        int pageMax = enabled.size() / 36;
-        if (pageNow > 0 && pageNow <= pageMax){
+        if (canPageUp()){
             pageNow--;
         }
         listToFull();
     }
 
+    public boolean canPageUp(){
+        return pageNow > 0 && pageNow <= getPageMax();
+    }
+
     public void pageDown(){
-        int pageMax = enabled.size() / 36;
-        if (pageNow >= 0 && pageNow < pageMax){
+        if (canPageDown()){
             pageNow++;
         }
         listToFull();
+    }
+
+    public boolean canPageDown(){
+        return pageNow >= 0 && pageNow < getPageMax();
+    }
+
+    public int getPageNow() {
+        return pageNow;
     }
 
     public int getPageMax() {
         return enabled.size() / 36;
     }
 
-    public int getPageNow() {
-        return pageNow;
-    }
 
     public void barPageUp(){
         slcToMap();
@@ -124,10 +131,18 @@ public class ContainerSkillSetting extends Container {
         listToSlc();
     }
 
+    public boolean canBarPageUp(){
+        return barPageNow > 0 && barPageNow <= barPageMax;
+    }
+
     public void barPageDown(){
         slcToMap();
         barPageNow = Math.min(barPageMax, barPageNow + 1);
         listToSlc();
+    }
+
+    public boolean canBarPageDown(){
+        return barPageNow >= 0 && barPageNow < barPageMax;
     }
 
     public int getBarPageNow() {

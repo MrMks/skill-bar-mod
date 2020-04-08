@@ -4,9 +4,10 @@ import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.KeyManager;
 import com.github.MrMks.skillbarmod.pkg.PackageSender;
 import com.github.MrMks.skillbarmod.skill.Manager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
+
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -19,13 +20,6 @@ public class KeyListener {
     public KeyListener(Object mod, GameSetting setting){
         this.mod = mod;
         this.setting = setting;
-        for (KeyBinding key : KeyManager.getHotKeys()) {
-            ClientRegistry.registerKeyBinding(key);
-        }
-        ClientRegistry.registerKeyBinding(KeyManager.getSettingKey());
-        ClientRegistry.registerKeyBinding(KeyManager.getToggleKey());
-        ClientRegistry.registerKeyBinding(KeyManager.getBarPageUpKey());
-        ClientRegistry.registerKeyBinding(KeyManager.getBarPageDownKey());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -182,29 +182,15 @@ public class Manager {
         }
     }
 
-    public boolean setBarMap(HashMap<Integer, String> nMap, int line){
-        if (isEmpty()) return false;
-        synchronized (barMap){
-            boolean flag = barMap.size() == nMap.size();
-            if (flag){
-                for (HashMap.Entry<Integer, String> entry : nMap.entrySet()){
-                    flag = entry.getValue().equals(barMap.getOrDefault(entry.getKey(), ""));
-                    if (!flag) break;
-                }
-            }
-            if (!flag){
-                for (int i = 0; i < 9; i++) map.remove(i + line * 9);
-                barMap.putAll(nMap);
-            }
-            return !flag;
-        }
-    }
-
     public String getKeyInBar(int i) {
         if (isEmpty()) return null;
         synchronized (barMap){
             return barMap.get(i);
         }
+    }
+
+    public Map<Integer, String> getBarMap() {
+        return new HashMap<>(barMap);
     }
 
     public synchronized Map<Integer, ItemStack> getBarIconMap(){
@@ -284,9 +270,5 @@ public class Manager {
         barMap.clear();
         cdMap.clear();
         iconCache.clear();
-    }
-
-    public Map<Integer, String> getBarMap() {
-        return new HashMap<>(barMap);
     }
 }

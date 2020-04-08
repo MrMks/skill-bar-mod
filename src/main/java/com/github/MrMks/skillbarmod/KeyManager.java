@@ -3,6 +3,7 @@ package com.github.MrMks.skillbarmod;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -39,5 +40,17 @@ public class KeyManager {
 
     public static KeyBinding getBarPageDownKey(){
         return pageDown;
+    }
+
+    public static void register(){
+        for (KeyBinding key : keys) register(key);
+        register(setting);
+        register(toggle);
+        register(pageUp);
+        register(pageDown);
+    }
+
+    private static void register(KeyBinding key){
+        ClientRegistry.registerKeyBinding(key);
     }
 }

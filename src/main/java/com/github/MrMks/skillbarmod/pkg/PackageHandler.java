@@ -186,14 +186,12 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         boolean suc = dec.readBoolean();
         byte code = dec.read();
         if (!suc){
-            Minecraft mc = Minecraft.getMinecraft();
             switch (code) {
                 case CAST_FAILED_NO_SKILL:
                     Manager manager = Manager.getManager();
                     if (manager.isActive()) manager.removeSkill(key);
                     break;
                 case CAST_FAILED_UNLOCK:
-                    break;
                 case CAST_FAILED_COOLDOWN:
                     break;
                 default:

@@ -5,7 +5,6 @@ import com.github.MrMks.skillbarmod.common.Constants;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

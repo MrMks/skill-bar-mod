@@ -1,6 +1,5 @@
 package com.github.MrMks.skillbarmod.gui;
 
-import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.KeyManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -15,6 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
@@ -44,6 +44,7 @@ public class GuiSkillSettings extends GuiContainer {
         this.buttonList.add(new GuiButton(BUTTON_UP, offsetX + 132, offsetY + 4, 19, 12, "")
         {
             @Override
+            @ParametersAreNonnullByDefault
             public void drawButton(Minecraft mc, int mouseX, int mouseY,float sd)
             {
                 if (this.visible)
@@ -52,14 +53,17 @@ public class GuiSkillSettings extends GuiContainer {
                     mc.getTextureManager().bindTexture(TEXTURE);
 
                     int x = mouseX - this.x, y = mouseY - this.y;
-
-                    if (x >= 0 && y >= 0 && x < this.width && y < this.height)
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 176, 12, this.width, this.height);
-                    }
-                    else
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 176, 0, this.width, this.height);
+                    if (containerSkill.canPageUp()) {
+                        if (x >= 0 && y >= 0 && x < this.width && y < this.height)
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 176, 12, this.width, this.height);
+                        }
+                        else
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 176, 0, this.width, this.height);
+                        }
+                    } else {
+                        this.drawTexturedModalRect(this.x, this.y, 176, 24, this.width, this.height);
                     }
                 }
             }
@@ -67,6 +71,7 @@ public class GuiSkillSettings extends GuiContainer {
         this.buttonList.add(new GuiButton(BUTTON_DOWN, offsetX + 151, offsetY + 4, 19, 12, "")
         {
             @Override
+            @ParametersAreNonnullByDefault
             public void drawButton(Minecraft mc, int mouseX, int mouseY, float sd)
             {
                 if (this.visible)
@@ -76,13 +81,17 @@ public class GuiSkillSettings extends GuiContainer {
                     mc.getTextureManager().bindTexture(TEXTURE);
                     int x = mouseX - this.x, y = mouseY - this.y;
 
-                    if (x >= 0 && y >= 0 && x < this.width && y < this.height)
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 195, 12, this.width, this.height);
-                    }
-                    else
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 195, 0, this.width, this.height);
+                    if (containerSkill.canPageDown()){
+                        if (x >= 0 && y >= 0 && x < this.width && y < this.height)
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 195, 12, this.width, this.height);
+                        }
+                        else
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 195, 0, this.width, this.height);
+                        }
+                    } else {
+                        this.drawTexturedModalRect(this.x ,this.y, 195, 24, this.width, this.height);
                     }
                 }
             }
@@ -90,6 +99,7 @@ public class GuiSkillSettings extends GuiContainer {
         this.buttonList.add(new GuiButton(BAR_BUTTON_UP, offsetX + 132, offsetY + 90, 19, 12, "")
         {
             @Override
+            @ParametersAreNonnullByDefault
             public void drawButton(Minecraft mc, int mouseX, int mouseY,float sd)
             {
                 if (this.visible)
@@ -99,13 +109,17 @@ public class GuiSkillSettings extends GuiContainer {
 
                     int x = mouseX - this.x, y = mouseY - this.y;
 
-                    if (x >= 0 && y >= 0 && x < this.width && y < this.height)
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 176, 12, this.width, this.height);
-                    }
-                    else
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 176, 0, this.width, this.height);
+                    if (containerSkill.canBarPageUp()){
+                        if (x >= 0 && y >= 0 && x < this.width && y < this.height)
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 176, 12, this.width, this.height);
+                        }
+                        else
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 176, 0, this.width, this.height);
+                        }
+                    } else {
+                        this.drawTexturedModalRect(this.x, this.y, 176, 24, this.width, this.height);
                     }
                 }
             }
@@ -113,6 +127,7 @@ public class GuiSkillSettings extends GuiContainer {
         this.buttonList.add(new GuiButton(BAR_BUTTON_DOWN, offsetX + 151, offsetY + 90, 19, 12, "")
         {
             @Override
+            @ParametersAreNonnullByDefault
             public void drawButton(Minecraft mc, int mouseX, int mouseY, float sd)
             {
                 if (this.visible)
@@ -122,13 +137,17 @@ public class GuiSkillSettings extends GuiContainer {
                     mc.getTextureManager().bindTexture(TEXTURE);
                     int x = mouseX - this.x, y = mouseY - this.y;
 
-                    if (x >= 0 && y >= 0 && x < this.width && y < this.height)
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 195, 12, this.width, this.height);
-                    }
-                    else
-                    {
-                        this.drawTexturedModalRect(this.x, this.y, 195, 0, this.width, this.height);
+                    if (containerSkill.canBarPageDown()){
+                        if (x >= 0 && y >= 0 && x < this.width && y < this.height)
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 195, 12, this.width, this.height);
+                        }
+                        else
+                        {
+                            this.drawTexturedModalRect(this.x, this.y, 195, 0, this.width, this.height);
+                        }
+                    } else {
+                        this.drawTexturedModalRect(this.x, this.y, 195, 24, this.width, this.height);
                     }
                 }
             }
@@ -162,6 +181,7 @@ public class GuiSkillSettings extends GuiContainer {
     }
 
     @Override
+    @ParametersAreNonnullByDefault
     protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
         if (slotIn != null)
         {
