@@ -10,11 +10,11 @@ key.skillbar.hotkey_8=Skill Key 8
 key.skillbar.hotkey_9=Skill Key 9
 key.skillbar.setting=Skill Bar Setting
 key.skillbar.toggle=Show Or Hide
+key.skillbar.bar_up=Switch Bar(Up)
+key.skillbar.bar_down=Switch Bar(Down)
 
 gui.skillbar.title_own=Owned Skills
 gui.skillbar.title_bar=Selected Skills
 
 msg.skillbar.enable=§2Skill Bar Enabled
 msg.skillbar.disable=§2Skill Bar Disabled
-
-msg.skillbar.fail_cd=§2Skill §6%s §2still in cooldown
