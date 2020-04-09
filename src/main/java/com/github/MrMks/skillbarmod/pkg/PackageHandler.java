@@ -187,7 +187,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
             for (int index = 0; index < size; index ++){
                 String key = dec.readCharSequence().toString();
                 int coolDown = dec.readInt();
-                coolDown = coolDown - (int)((now - time) / 1000L);
+                //coolDown = coolDown - (int)((now - time) / 1000L);
                 map.put(key,coolDown);
             }
             manager.setCoolDown(map);
