@@ -97,6 +97,10 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                     break;
                 case LIST_BAR:
                     onListBar(dec);
+                    break;
+                case CLEAN:
+                    onClean(dec);
+                    break;
             }
         }
         return null;
@@ -234,6 +238,11 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                 manager.setBarMap(map);
             }
         }
+    }
+
+    private void onClean(ByteDecoder dec){
+        Manager manager = Manager.getManager(dec.readInt());
+        manager.clear();
     }
 
     private ArrayList<SkillInfo> readSkillInfoList(ByteDecoder dec){
