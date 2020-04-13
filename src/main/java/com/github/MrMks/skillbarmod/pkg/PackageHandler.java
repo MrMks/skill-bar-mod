@@ -2,18 +2,16 @@ package com.github.MrMks.skillbarmod.pkg;
 
 import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.common.ByteDecoder;
-import com.github.MrMks.skillbarmod.common.Constants;
 import com.github.MrMks.skillbarmod.common.PartMerge;
+import com.github.MrMks.skillbarmod.common.SkillInfo;
+import com.github.MrMks.skillbarmod.common.handler.IClientHandler;
+import com.github.MrMks.skillbarmod.common.pkg.CPackage;
+import com.github.MrMks.skillbarmod.common.pkg.SPackage;
 import com.github.MrMks.skillbarmod.skill.Manager;
-import com.github.MrMks.skillbarmod.skill.SkillInfo;
+import com.github.MrMks.skillbarmod.skill.ForgeSkillInfo;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -22,6 +20,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.MrMks.skillbarmod.common.Constants.*;
 
@@ -30,7 +29,7 @@ import static com.github.MrMks.skillbarmod.common.Constants.*;
  * and methods under this class may be all running in network thread
  * Operation under this class should all consider about thread safety
  */
-public class PackageHandler implements IMessageHandler<PackageMessage, IMessage> {
+public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>, IClientHandler {
     private HashMap<Byte,PartMerge> partMap = new HashMap<>();
 
     @Override
@@ -60,140 +59,176 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
             ByteDecoder dec = new ByteDecoder(buf);
             switch (dec.getHeader()){
                 case DISCOVER:
-                    onDiscover(dec);
+                    SPackage.DECODER.decodeDiscover(this,dec);
+                    //onDiscover(dec);
                     break;
                 case ENABLE:
-                    onEnable(dec);
+                    SPackage.DECODER.decodeEnable(this,dec);
+                    //onEnable(dec);
                     break;
                 case SETTING:
-                    onSetting(dec);
+                    SPackage.DECODER.decodeSetting(this,dec);
+                    //onSetting(dec);
                     break;
                 case ACCOUNT:
-                    onAccount(dec);
+                    SPackage.DECODER.decodeAccount(this,dec);
+                    // onAccount(dec);
                     break;
                 case DISABLE:
-                    onDisable();
+                    SPackage.DECODER.decodeDisable(this,dec);
+                    // onDisable();
                     break;
                 case ENFORCE_LIST_SKILL:
-                    onEnforceListSkill(dec);
+                    SPackage.DECODER.decodeEnforceListSkill(this,dec);
+                    //onEnforceListSkill(dec);
                     break;
                 case LIST_SKILL:
-                    onListSkill(dec);
+                    SPackage.DECODER.decodeListSkill(this,dec);
+                    //onListSkill(dec);
                     break;
                 case ENFORCE_UPDATE_SKILL:
-                    onEnforceUpdateSKill(dec);
+                    SPackage.DECODER.decodeEnforceUpdateSkill(this,dec);
+                    //onEnforceUpdateSKill(dec);
                     break;
                 case UPDATE_SKILL:
-                    onUpdateSkill(dec);
+                    SPackage.DECODER.decodeUpdateSkill(this,dec);
+                    //onUpdateSkill(dec);
                     break;
                 case CAST:
-                    onCast(dec);
+                    SPackage.DECODER.decodeCast(this,dec);
+                    //onCast(dec);
                     break;
                 case COOLDOWN:
-                    onCoolDown(dec);
+                    SPackage.DECODER.decodeCoolDown(this,dec);
+                    //onCoolDown(dec);
                     break;
                 case ADD_SKILL:
-                    onAddSkill(dec);
+                    SPackage.DECODER.decodeAddSkill(this,dec);
+                    //onAddSkill(dec);
                     break;
                 case LIST_BAR:
-                    onListBar(dec);
+                    SPackage.DECODER.decodeListBar(this,dec);
+                    //onListBar(dec);
                     break;
                 case CLEAN:
-                    onClean(dec);
+                    SPackage.DECODER.decodeCleanUp(this,dec);
+                    //onClean(dec);
                     break;
             }
         }
         return null;
     }
 
-    private void onDiscover(ByteDecoder dec){
-        if (dec.readInt() == Constants.VERSION) PackageSender.sendDiscover();
+    @Override
+    public void onDiscover(int version) {
+        if (version == VERSION) PackageSender.send(CPackage.BUILDER.buildDiscover(ForgeByteBuilder::new));
     }
 
-    private void onSetting(ByteDecoder dec){
-        GameSetting.getInstance().setMaxBarPage(dec.readInt());
+    @Override
+    public void onSetting(int maxSize) {
+        GameSetting.getInstance().setMaxBarPage(maxSize);
     }
 
-    private void onEnable(ByteDecoder dec){
-        int activeId = dec.readInt();
-        int skillSize = dec.readInt();
+    @Override
+    public void onEnable(int activeId, int skillSize) {
         Manager manager;
         synchronized (manager = Manager.prepareManager(activeId)) {
             if (manager.getId() < 0) Manager.setActiveId(-1); //this should never happen as account id is only allowed to be 1 to n;
             else {
                 Manager.setEnable(true);
-                if (manager.isListSkill(skillSize)) PackageSender.sendListSkill(manager.getSkillKeyList());
-                if (manager.isListBar()) PackageSender.sendListBar();
+                if (manager.isListSkill(skillSize)) PackageSender.send(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
+                if (manager.isListBar()) PackageSender.send(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
                 Manager.setActiveId(activeId);
             }
         }
         Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
     }
 
-    private void onAccount(ByteDecoder dec){
-        int activeId = dec.readInt();
-        int skillSize = dec.readInt();
+    @Override
+    public void onAccount(int activeId, int skillSize) {
         Manager manager;
         Manager.setActiveId(activeId);
         synchronized (manager = Manager.prepareManager(activeId)){
             if (!manager.isActive()) return;
-            if (manager.isListSkill(skillSize)) PackageSender.sendListSkill(manager.getSkillKeyList());
-            if (manager.isListBar()) PackageSender.sendListBar();
+            if (manager.isListSkill(skillSize)) PackageSender.send(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
+            if (manager.isListBar()) PackageSender.send(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
         }
     }
 
-    private void onDisable(){
+    @Override
+    public void onCleanUp(int activeId) {
+        Manager manager = Manager.getManager(activeId);
+        manager.clear();
+    }
+
+    @Override
+    public void onDisable(){
         if (Manager.isEnable()){
             Manager.setEnable(false);
             Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.disable"))));
         }
     }
 
-    private void onListSkill(ByteDecoder dec){
+    @Override
+    public void onListSkill(List<SkillInfo> aList, List<CharSequence> reList) {
         Manager manager;
+        ArrayList<ForgeSkillInfo> infos = new ArrayList<>();
+        for (SkillInfo info : aList) infos.add(new ForgeSkillInfo(info));
         synchronized (manager = Manager.getManager()){
-            if (manager.isActive()) manager.setSkillMap(readSkillInfoList(dec), dec.readCharSequenceList());
+            if (manager.isActive()) manager.setSkillMap(infos, reList);
         }
     }
 
-    private void onEnforceListSkill(ByteDecoder dec){
-        int activeId = dec.readInt();
-        Manager manager = Manager.getManager(activeId);
+    @Override
+    public void onEnforceListSkill(int id, List<SkillInfo> list) {
+        Manager manager = Manager.getManager(id);
         if (manager != null && manager.getId() > 0){
-            manager.setSkillMap(readSkillInfoList(dec));
+            ArrayList<ForgeSkillInfo> infos = new ArrayList<>();
+            for (SkillInfo info : list) infos.add(new ForgeSkillInfo(info));
+            manager.setSkillMap(infos);
         }
     }
 
-    private void onUpdateSkill(ByteDecoder dec){
-        String key = dec.readCharSequence().toString();
-        boolean exist = dec.readBoolean();
+    @Override
+    public void onUpdateSkill(SkillInfo info) {
         Manager manager = Manager.getManager();
         if (manager.isActive()){
-            if (exist) {
-                SkillInfo info = new SkillInfo(key, dec.readBoolean(), dec.readBoolean(), readItemStack(dec));
-                manager.addSkill(info);
-            } else {
-                manager.removeSkill(key);
-            }
+            if (info.isExist()) {
+                manager.addSkill(new ForgeSkillInfo(info));
+            } else manager.removeSkill(info.getKey());
         }
     }
 
-    private void onEnforceUpdateSKill(ByteDecoder dec){
-        int activeId = dec.readInt();
-        SkillInfo info = readSkillInfo(dec);
-        Manager manager = Manager.getManager(activeId);
-        if (manager != null && manager.getId() > 0) manager.addSkill(info);
+    @Override
+    public void onEnforceUpdateSKill(int id, SkillInfo info) {
+        if (info.isExist()) {
+            Manager manager = Manager.getManager(id);
+            if (manager != null && manager.getId() > 0) manager.addSkill(new ForgeSkillInfo(info));
+        }
     }
 
-    private void onCast(ByteDecoder dec){
-        String key = dec.readCharSequence().toString();
-        boolean suc = dec.readBoolean();
-        byte code = dec.read();
+    @Override
+    public void onAddSkill(int activeId, int skillSize) {
+        onAccount(activeId,skillSize);
+    }
+
+    @Override
+    public void onListBar(Map<Integer, CharSequence> map) {
+        Manager manager = Manager.getManager();
+        if (manager.isActive()){
+            Map<Integer,String> nMap = new HashMap<>();
+            for (Map.Entry<Integer, CharSequence> entry: map.entrySet()) nMap.put(entry.getKey(), entry.getValue().toString());
+            manager.setBarMap(nMap);
+        }
+    }
+
+    @Override
+    public void onCast(CharSequence key, boolean exist, boolean suc, byte code) {
         if (!suc){
             switch (code) {
                 case CAST_FAILED_NO_SKILL:
                     Manager manager = Manager.getManager();
-                    if (manager.isActive()) manager.removeSkill(key);
+                    if (manager.isActive()) manager.removeSkill(key.toString());
                     break;
                 case CAST_FAILED_UNLOCK:
                 case CAST_FAILED_COOLDOWN:
@@ -203,80 +238,14 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         }
     }
 
-    private void onCoolDown(ByteDecoder dec){
+    @Override
+    public void onCoolDown(Map<CharSequence, Integer> map) {
         Manager manager = Manager.getManager();
         if (manager.isActive()){
-            long time = dec.readLong();
-            long now = System.currentTimeMillis();
-            int size = dec.readInt();
-            HashMap<String, Integer> map = new HashMap<>(size);
-            for (int index = 0; index < size; index ++){
-                String key = dec.readCharSequence().toString();
-                int coolDown = dec.readInt();
-                //coolDown = coolDown - (int)((now - time) / 1000L);
-                map.put(key,coolDown);
-            }
-            manager.setCoolDown(map);
+            HashMap<String, Integer> nMap = new HashMap<>();
+            for (Map.Entry<CharSequence, Integer> entry : map.entrySet()) nMap.put(entry.getKey().toString(), entry.getValue());
+            manager.setCoolDown(nMap);
         }
-    }
-
-    private void onAddSkill(ByteDecoder dec){
-        //if (!isEnable()) return;
-        onAccount(dec);
-    }
-
-    private void onListBar(ByteDecoder dec){
-        Manager manager = Manager.getManager();
-        if (manager.isActive()){
-            boolean exist = dec.readBoolean();
-            if (exist) {
-                int size = dec.readInt();
-                HashMap<Integer, String> map = new HashMap<>();
-                for (int i = 0; i < size; i++){
-                    map.put(dec.readInt(), dec.readCharSequence().toString());
-                }
-                manager.setBarMap(map);
-            }
-        }
-    }
-
-    private void onClean(ByteDecoder dec){
-        Manager manager = Manager.getManager(dec.readInt());
-        manager.clear();
-    }
-
-    private ArrayList<SkillInfo> readSkillInfoList(ByteDecoder dec){
-        int size = dec.readInt();
-        ArrayList<SkillInfo> list = new ArrayList<>(size);
-        for (int index = 0; index < size; index ++){
-            list.add(readSkillInfo(dec));
-        }
-        return list;
-    }
-
-    private SkillInfo readSkillInfo(ByteDecoder dec){
-        String key = dec.readCharSequence().toString();
-        boolean unlock = dec.readBoolean();
-        boolean canCast = dec.readBoolean();
-        ItemStack stack = readItemStack(dec);
-        return new SkillInfo(key, unlock, canCast, stack);
-    }
-
-    private ItemStack readItemStack(ByteDecoder dec){
-        int itemId = dec.readInt();
-        int amount = 1;
-        short damage = dec.readShort();
-        NBTTagCompound display = new NBTTagCompound();
-        display.setTag("Name", new NBTTagString(dec.readCharSequence().toString()));
-        NBTTagList loreList = new NBTTagList();
-        List<CharSequence> lores = dec.readCharSequenceList();
-        for (CharSequence sequence : lores){
-            loreList.appendTag(new NBTTagString(sequence.toString()));
-        }
-        display.setTag("Lore", loreList);
-        ItemStack stack = new ItemStack(Item.getItemById(itemId),amount,damage);
-        stack.setTagInfo("display", display);
-        return stack;
     }
 
 }

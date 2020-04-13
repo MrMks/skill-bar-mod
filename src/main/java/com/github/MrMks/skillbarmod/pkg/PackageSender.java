@@ -53,6 +53,10 @@ public class PackageSender {
         send(builder.buildBuf());
     }
 
+    public static void send(ByteBuilder builder){
+        send(builder.buildBuf());
+    }
+
     public static void send(ByteBuf buf){
         PackageMessage message = new PackageMessage();
         message.setBuf(buf);

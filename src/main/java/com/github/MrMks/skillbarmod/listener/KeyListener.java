@@ -2,6 +2,8 @@ package com.github.MrMks.skillbarmod.listener;
 
 import com.github.MrMks.skillbarmod.GameSetting;
 import com.github.MrMks.skillbarmod.KeyManager;
+import com.github.MrMks.skillbarmod.common.pkg.CPackage;
+import com.github.MrMks.skillbarmod.pkg.ForgeByteBuilder;
 import com.github.MrMks.skillbarmod.pkg.PackageSender;
 import com.github.MrMks.skillbarmod.skill.Manager;
 
@@ -40,7 +42,7 @@ public class KeyListener {
                 if (keys.get(i).isPressed()){
                     String key = manager.getKeyInBar(i + setting.getBarPage() * 9);
                     if (key != null && !key.isEmpty()) {
-                        PackageSender.sendCast(key);
+                        PackageSender.send(CPackage.BUILDER.buildCast(ForgeByteBuilder::new, key));
                         break;
                     }
                 }

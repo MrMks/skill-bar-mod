@@ -69,7 +69,7 @@ public class Manager {
     }
 
     private final int id;
-    private final HashMap<String, SkillInfo> skillMap = new HashMap<>();
+    private final HashMap<String, ForgeSkillInfo> skillMap = new HashMap<>();
     private final HashMap<Integer, String> barMap = new HashMap<>(9);
     private final HashMap<String, Integer> cdMap = new HashMap<>(9);
     private final HashMap<String, ItemStack> iconCache = new HashMap<>(9);
@@ -90,19 +90,19 @@ public class Manager {
         return false;
     }
 
-    public void setSkillMap(List<SkillInfo> aList, List<? extends CharSequence> reList){
+    public void setSkillMap(List<ForgeSkillInfo> aList, List<? extends CharSequence> reList){
         if (isEmpty()) return;
         synchronized (skillMap){
-            for (SkillInfo info : aList) skillMap.put(info.getKey(), info);
+            for (ForgeSkillInfo info : aList) skillMap.put(info.getKey(), info);
             for (CharSequence key : reList) skillMap.remove(key.toString());
         }
     }
 
-    public void setSkillMap(List<SkillInfo> nList){
+    public void setSkillMap(List<ForgeSkillInfo> nList){
         if (isEmpty()) return;
         synchronized (skillMap) {
             skillMap.clear();
-            for (SkillInfo info : nList) skillMap.put(info.getKey(), info);
+            for (ForgeSkillInfo info : nList) skillMap.put(info.getKey(), info);
         }
     }
 
@@ -117,7 +117,7 @@ public class Manager {
         if (isEmpty()) return Collections.emptyList();
         synchronized (skillMap){
             ArrayList<ItemStack> list = new ArrayList<>();
-            for (SkillInfo info : skillMap.values()){
+            for (ForgeSkillInfo info : skillMap.values()){
                 if (info.isCanCast() && info.isUnlock()){
                     ItemStack stack = info.getIcon().copy();
                     stack.setCount(1);
@@ -136,7 +136,7 @@ public class Manager {
         }
     }
 
-    public void addSkill(SkillInfo info){
+    public void addSkill(ForgeSkillInfo info){
         if (isEmpty()) return;
         synchronized (skillMap) {
             skillMap.put(info.getKey(), info);
@@ -151,7 +151,7 @@ public class Manager {
     }
 
     public String getSkillDisplayName(String key){
-        SkillInfo info = skillMap.get(key);
+        ForgeSkillInfo info = skillMap.get(key);
         if (info == null) return key;
         else {
             String name = info.getIcon().getDisplayName();
@@ -217,7 +217,7 @@ public class Manager {
                 }
             }
             if (icon == null){
-                SkillInfo info = skillMap.get(key);
+                ForgeSkillInfo info = skillMap.get(key);
                 if (info != null){
                     icon = info.getIcon().copy();
                     if (icon.hasTagCompound() && icon.getTagCompound() != null){

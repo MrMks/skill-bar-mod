@@ -1,6 +1,8 @@
 package com.github.MrMks.skillbarmod.gui;
 
 import com.github.MrMks.skillbarmod.GameSetting;
+import com.github.MrMks.skillbarmod.common.pkg.CPackage;
+import com.github.MrMks.skillbarmod.pkg.ForgeByteBuilder;
 import com.github.MrMks.skillbarmod.pkg.PackageSender;
 import com.github.MrMks.skillbarmod.skill.Manager;
 import mcp.MethodsReturnNonnullByDefault;
@@ -59,7 +61,7 @@ public class ContainerSkillSetting extends Container {
         //super.onContainerClosed(playerIn);
         slcToMap();
         if (manager.setBarMap(map)){
-            PackageSender.sendSaveBar(manager.getId(), map);
+            PackageSender.send(CPackage.BUILDER.buildSaveBar(ForgeByteBuilder::new, map));
         }
     }
 
