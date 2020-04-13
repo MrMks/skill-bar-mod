@@ -61,6 +61,23 @@ public abstract class ByteBuilder {
         return this;
     }
 
+    public ByteBuilder writeSkillInfo(SkillInfo info){
+        writeCharSequence(info.getKey());
+        writeBoolean(info.isUnlock());
+        writeBoolean(info.canCast());
+        writeInt(info.getItemId());
+        writeShort(info.getDamage());
+        writeCharSequence(info.getDisplay());
+        writeCharSequenceList(info.getLore());
+        return this;
+    }
+
+    public ByteBuilder writeSkillInfoList(List<SkillInfo> infos){
+        writeInt(infos.size());
+        for (SkillInfo info : infos) writeSkillInfo(info);
+        return this;
+    }
+
     public abstract byte[][] build(byte partId);
 
     public abstract ByteBuf buildBuf();
