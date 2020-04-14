@@ -1,4 +1,4 @@
-package com.github.MrMks.skillbarmod.pkg;
+package com.github.MrMks.skillbar.forge.pkg;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

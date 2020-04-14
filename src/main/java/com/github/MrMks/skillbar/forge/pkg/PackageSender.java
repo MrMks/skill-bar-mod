@@ -1,7 +1,7 @@
-package com.github.MrMks.skillbarmod.pkg;
+package com.github.MrMks.skillbar.forge.pkg;
 
-import com.github.MrMks.skillbarmod.common.ByteBuilder;
-import com.github.MrMks.skillbarmod.common.Constants;
+import com.github.MrMks.skillbar.common.ByteBuilder;
+import com.github.MrMks.skillbar.common.Constants;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 

@@ -1,6 +1,6 @@
-package com.github.MrMks.skillbarmod.gui;
+package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbarmod.KeyManager;
+import com.github.MrMks.skillbar.forge.KeyManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;

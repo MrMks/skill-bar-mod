@@ -1,14 +1,14 @@
-package com.github.MrMks.skillbarmod.pkg;
+package com.github.MrMks.skillbar.forge.pkg;
 
-import com.github.MrMks.skillbarmod.GameSetting;
-import com.github.MrMks.skillbarmod.common.ByteDecoder;
-import com.github.MrMks.skillbarmod.common.PartMerge;
-import com.github.MrMks.skillbarmod.common.SkillInfo;
-import com.github.MrMks.skillbarmod.common.handler.IClientHandler;
-import com.github.MrMks.skillbarmod.common.pkg.CPackage;
-import com.github.MrMks.skillbarmod.common.pkg.SPackage;
-import com.github.MrMks.skillbarmod.skill.Manager;
-import com.github.MrMks.skillbarmod.skill.ForgeSkillInfo;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.common.ByteDecoder;
+import com.github.MrMks.skillbar.common.PartMerge;
+import com.github.MrMks.skillbar.common.SkillInfo;
+import com.github.MrMks.skillbar.common.handler.IClientHandler;
+import com.github.MrMks.skillbar.common.pkg.CPackage;
+import com.github.MrMks.skillbar.common.pkg.SPackage;
+import com.github.MrMks.skillbar.forge.skill.Manager;
+import com.github.MrMks.skillbar.forge.skill.ForgeSkillInfo;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.MrMks.skillbarmod.common.Constants.*;
+import static com.github.MrMks.skillbar.common.Constants.*;
 
 /**
  * This class response to handle messages from server plugin;

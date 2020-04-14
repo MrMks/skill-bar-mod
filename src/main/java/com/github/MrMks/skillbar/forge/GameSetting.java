@@ -1,4 +1,4 @@
-package com.github.MrMks.skillbarmod;
+package com.github.MrMks.skillbar.forge;
 
 /**
  * This class is response to save all gaming settings;
@@ -14,7 +14,7 @@ public class GameSetting {
     }
 
     /**
-     * should or not render {@link com.github.MrMks.skillbarmod.gui.GuiSkillBar} overlay;
+     * should or not render {@link com.github.MrMks.skillbar.forge.gui.GuiSkillBar} overlay;
      */
     private boolean show = true;
     public void toggle(){
@@ -27,7 +27,7 @@ public class GameSetting {
 
     /**
      * how many line of bar is active;
-     * Mainly used in {@link com.github.MrMks.skillbarmod.gui.ContainerSkillSetting}, {@link com.github.MrMks.skillbarmod.gui.GuiSkillBar} and {@link com.github.MrMks.skillbarmod.gui.GuiSkillSettings};
+     * Mainly used in {@link com.github.MrMks.skillbar.forge.gui.ContainerSkillSetting}, {@link com.github.MrMks.skillbar.forge.gui.GuiSkillBar} and {@link com.github.MrMks.skillbar.forge.gui.GuiSkillSettings};
      */
     private int barPage = 0;
     private int maxPage = 2;

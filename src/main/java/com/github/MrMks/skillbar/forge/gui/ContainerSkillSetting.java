@@ -1,10 +1,10 @@
-package com.github.MrMks.skillbarmod.gui;
+package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbarmod.GameSetting;
-import com.github.MrMks.skillbarmod.common.pkg.CPackage;
-import com.github.MrMks.skillbarmod.pkg.ForgeByteBuilder;
-import com.github.MrMks.skillbarmod.pkg.PackageSender;
-import com.github.MrMks.skillbarmod.skill.Manager;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.common.pkg.CPackage;
+import com.github.MrMks.skillbar.forge.pkg.ForgeByteBuilder;
+import com.github.MrMks.skillbar.forge.pkg.PackageSender;
+import com.github.MrMks.skillbar.forge.skill.Manager;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

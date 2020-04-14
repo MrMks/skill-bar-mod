@@ -1,6 +1,6 @@
-package com.github.MrMks.skillbarmod.skill;
+package com.github.MrMks.skillbar.forge.skill;
 
-import com.github.MrMks.skillbarmod.common.SkillInfo;
+import com.github.MrMks.skillbar.common.SkillInfo;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

@@ -1,12 +1,12 @@
-package com.github.MrMks.skillbarmod;
+package com.github.MrMks.skillbar.forge;
 
-import com.github.MrMks.skillbarmod.common.Constants;
-import com.github.MrMks.skillbarmod.gui.GuiHandler;
-import com.github.MrMks.skillbarmod.listener.KeyListener;
-import com.github.MrMks.skillbarmod.listener.MainListener;
-import com.github.MrMks.skillbarmod.pkg.PackageHandler;
-import com.github.MrMks.skillbarmod.pkg.PackageMessage;
-import com.github.MrMks.skillbarmod.pkg.PackageSender;
+import com.github.MrMks.skillbar.common.Constants;
+import com.github.MrMks.skillbar.forge.gui.GuiHandler;
+import com.github.MrMks.skillbar.forge.listener.KeyListener;
+import com.github.MrMks.skillbar.forge.listener.MainListener;
+import com.github.MrMks.skillbar.forge.pkg.PackageHandler;
+import com.github.MrMks.skillbar.forge.pkg.PackageMessage;
+import com.github.MrMks.skillbar.forge.pkg.PackageSender;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;

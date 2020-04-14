@@ -1,4 +1,4 @@
-package com.github.MrMks.skillbarmod;
+package com.github.MrMks.skillbar.forge;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyConflictContext;

@@ -1,7 +1,7 @@
-package com.github.MrMks.skillbarmod.gui;
+package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbarmod.GameSetting;
-import com.github.MrMks.skillbarmod.skill.Manager;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;

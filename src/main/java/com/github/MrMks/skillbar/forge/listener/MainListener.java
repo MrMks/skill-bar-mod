@@ -1,8 +1,8 @@
-package com.github.MrMks.skillbarmod.listener;
+package com.github.MrMks.skillbar.forge.listener;
 
-import com.github.MrMks.skillbarmod.GameSetting;
-import com.github.MrMks.skillbarmod.gui.GuiSkillBar;
-import com.github.MrMks.skillbarmod.skill.Manager;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.forge.gui.GuiSkillBar;
+import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;

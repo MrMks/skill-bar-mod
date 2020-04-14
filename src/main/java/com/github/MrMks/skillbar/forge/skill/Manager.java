@@ -1,4 +1,4 @@
-package com.github.MrMks.skillbarmod.skill;
+package com.github.MrMks.skillbar.forge.skill;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagString;

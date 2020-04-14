@@ -1,11 +1,11 @@
-package com.github.MrMks.skillbarmod.listener;
+package com.github.MrMks.skillbar.forge.listener;
 
-import com.github.MrMks.skillbarmod.GameSetting;
-import com.github.MrMks.skillbarmod.KeyManager;
-import com.github.MrMks.skillbarmod.common.pkg.CPackage;
-import com.github.MrMks.skillbarmod.pkg.ForgeByteBuilder;
-import com.github.MrMks.skillbarmod.pkg.PackageSender;
-import com.github.MrMks.skillbarmod.skill.Manager;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.forge.KeyManager;
+import com.github.MrMks.skillbar.common.pkg.CPackage;
+import com.github.MrMks.skillbar.forge.pkg.ForgeByteBuilder;
+import com.github.MrMks.skillbar.forge.pkg.PackageSender;
+import com.github.MrMks.skillbar.forge.skill.Manager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;

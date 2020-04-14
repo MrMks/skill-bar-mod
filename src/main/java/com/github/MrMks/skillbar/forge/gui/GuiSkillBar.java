@@ -1,8 +1,8 @@
-package com.github.MrMks.skillbarmod.gui;
+package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbarmod.GameSetting;
-import com.github.MrMks.skillbarmod.KeyManager;
-import com.github.MrMks.skillbarmod.skill.Manager;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.forge.KeyManager;
+import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiIngame;
