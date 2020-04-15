@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbar.forge.pkg;
 
+import com.github.MrMks.skillbar.common.ByteBuilder;
 import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.common.ByteDecoder;
 import com.github.MrMks.skillbar.common.PartMerge;
@@ -17,10 +18,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.MrMks.skillbar.common.Constants.*;
 
@@ -30,7 +28,7 @@ import static com.github.MrMks.skillbar.common.Constants.*;
  * Operation under this class should all consider about thread safety
  */
 public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>, IClientHandler {
-    private HashMap<Byte,PartMerge> partMap = new HashMap<>();
+    private final HashMap<Byte,PartMerge> partMap = new HashMap<>();
 
     @Override
     public IMessage onMessage(PackageMessage message, MessageContext ctx) {
@@ -114,6 +112,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                     SPackage.DECODER.decodeCleanUp(this,dec);
                     //onClean(dec);
                     break;
+                case FIX_BAR:
+                    SPackage.DECODER.decodeFixBar(this,dec);
+                    break;
             }
         }
         return null;
@@ -129,19 +130,14 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         GameSetting.getInstance().setMaxBarPage(maxSize);
     }
 
+    private final Queue<ByteBuilder> queue = new LinkedList<>();
     @Override
-    public void onEnable(int activeId, int skillSize) {
-        Manager manager;
-        synchronized (manager = Manager.prepareManager(activeId)) {
-            if (manager.getId() < 0) Manager.setActiveId(-1); //this should never happen as account id is only allowed to be 1 to n;
-            else {
-                Manager.setEnable(true);
-                if (manager.isListSkill(skillSize)) PackageSender.send(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
-                if (manager.isListBar()) PackageSender.send(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
-                Manager.setActiveId(activeId);
-            }
+    public void onEnable() {
+        if (!Manager.isEnable()) {
+            Manager.setEnable(true);
+            while (!queue.isEmpty()) PackageSender.send(queue.poll());
+            Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
         }
-        Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
     }
 
     @Override
@@ -149,9 +145,10 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         Manager manager;
         Manager.setActiveId(activeId);
         synchronized (manager = Manager.prepareManager(activeId)){
-            if (!manager.isActive()) return;
-            if (manager.isListSkill(skillSize)) PackageSender.send(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
-            if (manager.isListBar()) PackageSender.send(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
+            queue.clear();
+            if (manager.isListSkill(skillSize)) queue.add(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
+            if (!GameSetting.getInstance().isFixBar() && manager.isListBar()) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
+            if (Manager.isEnable()) while (!queue.isEmpty()) PackageSender.send(queue.poll());
         }
     }
 
@@ -208,8 +205,8 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onAddSkill(int activeId, int skillSize) {
-        onAccount(activeId,skillSize);
+    public void onAddSkill(List<SkillInfo> list) {
+        onListSkill(list, Collections.emptyList());
     }
 
     @Override
@@ -220,6 +217,11 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
             for (Map.Entry<Integer, CharSequence> entry: map.entrySet()) nMap.put(entry.getKey(), entry.getValue().toString());
             manager.setBarMap(nMap);
         }
+    }
+
+    @Override
+    public void onFixBar(boolean fix) {
+        GameSetting.getInstance().setFixBar(fix);
     }
 
     @Override
