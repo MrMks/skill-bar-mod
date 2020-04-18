@@ -59,11 +59,9 @@ public class ContainerSkillSetting extends Container {
     @Override
     public void onContainerClosed(EntityPlayer playerIn) {
         //super.onContainerClosed(playerIn);
-        if (!GameSetting.getInstance().isFixBar()) {
-            slcToMap();
-            if (manager.setBarMap(map)) {
-                PackageSender.send(CPackage.BUILDER.buildSaveBar(ForgeByteBuilder::new, map));
-            }
+        slcToMap();
+        if (manager.setBarMap(map)) {
+            PackageSender.send(CPackage.BUILDER.buildSaveBar(ForgeByteBuilder::new, map));
         }
     }
 

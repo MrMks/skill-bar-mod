@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbar.forge.skill;
 
+import com.github.MrMks.skillbar.forge.GameSetting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagString;
 
@@ -66,6 +67,13 @@ public class Manager {
             activeId.set(-1);
             enable.set(false);
         }
+    }
+
+    private static List<Integer> freeList = new ArrayList<>();
+    public static void clearFreeList(){freeList.clear();}
+    public static void setFreeList(List<Integer> list){
+        freeList.clear();
+        freeList.addAll(list);
     }
 
     private final int id;
@@ -167,6 +175,14 @@ public class Manager {
     public boolean setBarMap(Map<Integer, String> nMap){
         if (isEmpty()) return false;
         synchronized (barMap){
+            if (GameSetting.getInstance().isFixBar() && !freeList.isEmpty()) {
+                List<Integer> list = new ArrayList<>(nMap.keySet());
+                list.removeIf(key->freeList.contains(key));
+                list.forEach(key->{
+                    if (barMap.containsKey(key)) nMap.put(key,barMap.get(key));
+                    else nMap.remove(key);
+                });
+            }
             boolean flag = barMap.size() == nMap.size();
             if (flag){
                 for (HashMap.Entry<Integer, String> entry : nMap.entrySet()){
@@ -204,6 +220,8 @@ public class Manager {
             if (!skillMap.containsKey(key)){
                 list.add(index);
                 iconCache.remove(key);
+                continue;
+            } else if (!skillMap.get(key).isUnlock()){
                 continue;
             }
             ItemStack icon = iconCache.get(key);

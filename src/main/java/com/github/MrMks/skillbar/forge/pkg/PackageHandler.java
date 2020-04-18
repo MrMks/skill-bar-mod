@@ -115,6 +115,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                 case FIX_BAR:
                     SPackage.DECODER.decodeFixBar(this,dec);
                     break;
+                case FREE_SLOTS:
+                    SPackage.DECODER.decodeFreeSlots(this,dec);
+                    break;
             }
         }
         return null;
@@ -147,7 +150,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         synchronized (manager = Manager.prepareManager(activeId)){
             queue.clear();
             if (manager.isListSkill(skillSize)) queue.add(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
-            if (!GameSetting.getInstance().isFixBar() && manager.isListBar()) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
+            if (manager.isListBar()) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
             if (Manager.isEnable()) while (!queue.isEmpty()) PackageSender.send(queue.poll());
         }
     }
@@ -222,6 +225,12 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     @Override
     public void onFixBar(boolean fix) {
         GameSetting.getInstance().setFixBar(fix);
+        if (!fix) Manager.clearFreeList();
+    }
+
+    @Override
+    public void onFreeSlot(List<Integer> list) {
+        Manager.setFreeList(list);
     }
 
     @Override
