@@ -131,6 +131,8 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     @Override
     public void onSetting(int maxSize) {
         GameSetting.getInstance().setMaxBarPage(maxSize);
+        if (Manager.getManager().isActive()){
+        }
     }
 
     private final Queue<ByteBuilder> queue = new LinkedList<>();
@@ -218,7 +220,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         if (manager.isActive()){
             Map<Integer,String> nMap = new HashMap<>();
             for (Map.Entry<Integer, CharSequence> entry: map.entrySet()) nMap.put(entry.getKey(), entry.getValue().toString());
-            manager.setBarMap(nMap);
+            manager.setBarMap(nMap,true);
         }
     }
 

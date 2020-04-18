@@ -74,6 +74,7 @@ public class ContainerSkillSetting extends Container {
             if (slot != null){
                 ItemStack item = slot.getStack();
                 ItemStack mItem = inventoryPlayer.getItemStack();
+                if (item.hasTagCompound() && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
                 if (dragType == 1){
                     if (!mItem.isEmpty()){
                         inventoryPlayer.setItemStack(ItemStack.EMPTY);

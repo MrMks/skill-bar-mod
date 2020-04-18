@@ -1,7 +1,12 @@
 package com.github.MrMks.skillbar.forge.skill;
 
 import com.github.MrMks.skillbar.forge.GameSetting;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockBarrier;
+import net.minecraft.block.material.Material;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagString;
 
 import javax.annotation.Nonnull;
@@ -173,9 +178,13 @@ public class Manager {
      * @return true if nMap have difference form barMap;
      */
     public boolean setBarMap(Map<Integer, String> nMap){
+        return setBarMap(nMap,false);
+    }
+
+    public boolean setBarMap(Map<Integer, String> nMap, boolean forceSet){
         if (isEmpty()) return false;
         synchronized (barMap){
-            if (GameSetting.getInstance().isFixBar() && !freeList.isEmpty()) {
+            if (!forceSet && GameSetting.getInstance().isFixBar() && !freeList.isEmpty()) {
                 List<Integer> list = new ArrayList<>(nMap.keySet());
                 list.removeIf(key->freeList.contains(key));
                 list.forEach(key->{
@@ -215,7 +224,6 @@ public class Manager {
         ArrayList<Integer> list = new ArrayList<>(9);
         for (Map.Entry<Integer, String> entry : barMap.entrySet()){
             int index = entry.getKey();
-            if (!barMap.containsKey(index)) continue;
             String key = entry.getValue();
             if (!skillMap.containsKey(key)){
                 list.add(index);
@@ -256,6 +264,11 @@ public class Manager {
             }
         }
         for (Integer o : list) barMap.remove(o);
+        if (GameSetting.getInstance().isFixBar()) {
+            ItemStack fixedSlot = new ItemStack(Item.getByNameOrId("minecraft:barrier"),1);
+            fixedSlot.setTagInfo("fix", new NBTTagByte((byte) 0));
+            for (int index = 0;index < GameSetting.getInstance().getMaxBarPage() * 9 + 9;index++) if (!barMap.containsKey(index) && !freeList.contains(index)) rIconMap.put(index,fixedSlot);
+        }
         return rIconMap;
     }
 
