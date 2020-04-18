@@ -1,5 +1,6 @@
 package com.github.MrMks.skillbar.forge.listener;
 
+import com.github.MrMks.skillbar.forge.ConditionManager;
 import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.forge.gui.GuiSkillBar;
 import com.github.MrMks.skillbar.forge.skill.Manager;
@@ -31,6 +32,7 @@ public class MainListener {
     // handle playerDisconnect
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPlayerDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
+        ConditionManager.leave();
         GameSetting.clean();
         Manager.clean();
     }

@@ -1,6 +1,7 @@
 package com.github.MrMks.skillbar.forge.pkg;
 
 import com.github.MrMks.skillbar.common.ByteBuilder;
+import com.github.MrMks.skillbar.forge.ConditionManager;
 import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.common.ByteDecoder;
 import com.github.MrMks.skillbar.common.PartMerge;
@@ -112,11 +113,11 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                     SPackage.DECODER.decodeCleanUp(this,dec);
                     //onClean(dec);
                     break;
-                case FIX_BAR:
-                    SPackage.DECODER.decodeFixBar(this,dec);
+                case ENTER_CONDITION:
+                    SPackage.DECODER.decodeEnterCondition(this,dec);
                     break;
-                case FREE_SLOTS:
-                    SPackage.DECODER.decodeFreeSlots(this,dec);
+                case LEAVE_CONDITION:
+                    SPackage.DECODER.decodeLeaveCondition(this,dec);
                     break;
             }
         }
@@ -131,8 +132,6 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     @Override
     public void onSetting(int maxSize) {
         GameSetting.getInstance().setMaxBarPage(maxSize);
-        if (Manager.getManager().isActive()){
-        }
     }
 
     private final Queue<ByteBuilder> queue = new LinkedList<>();
@@ -152,8 +151,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         synchronized (manager = Manager.prepareManager(activeId)){
             queue.clear();
             if (manager.isListSkill(skillSize)) queue.add(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
-            if (manager.isListBar()) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
+            if (manager.isListBar() || conditionSwitch) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
             if (Manager.isEnable()) while (!queue.isEmpty()) PackageSender.send(queue.poll());
+            conditionSwitch = false;
         }
     }
 
@@ -224,15 +224,30 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         }
     }
 
+    private boolean conditionSwitch = false;
     @Override
-    public void onFixBar(boolean fix) {
-        GameSetting.getInstance().setFixBar(fix);
-        if (!fix) Manager.clearFreeList();
+    public void onEnterCondition(CharSequence key, int size, boolean fix, boolean free, List<Integer> freeSlots) {
+        ConditionManager.enter(key.toString(),size,fix, free, freeSlots);
+        conditionSwitch = true;
     }
 
     @Override
+    public void onLeaveCondition(CharSequence key) {
+        ConditionManager.leave();
+        conditionSwitch = true;
+    }
+
+    @Override
+    @Deprecated
+    public void onFixBar(boolean fix) {
+        //GameSetting.getInstance().setFixBar(fix);
+        //if (!fix) Manager.clearFreeList();
+    }
+
+    @Override
+    @Deprecated
     public void onFreeSlot(List<Integer> list) {
-        Manager.setFreeList(list);
+        //Manager.setFreeList(list);
     }
 
     @Override

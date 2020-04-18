@@ -44,14 +44,6 @@ public class GameSetting {
     }
 
     public int getMaxBarPage() {
-        return maxPage;
-    }
-
-    private boolean fixBar = false;
-    public void setFixBar(boolean is){
-        fixBar = is;
-    }
-    public boolean isFixBar() {
-        return fixBar;
+        return ConditionManager.isActive() ? ConditionManager.getBarSize() : maxPage;
     }
 }
