@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.2.5-8-a1"
+version = "1.2.5-9-a3"
 group = "com.github.MrMks" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "SecondSkillBar(Mod)"
 
@@ -64,7 +64,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    shade 'com.github.mrmks:skillbar-common:8'
+    shade 'com.github.mrmks:skillbar-common:9'
 }
 
 jar {

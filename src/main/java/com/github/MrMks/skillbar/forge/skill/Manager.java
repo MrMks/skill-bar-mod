@@ -1,10 +1,7 @@
 package com.github.MrMks.skillbar.forge.skill;
 
-import com.github.MrMks.skillbar.forge.ConditionManager;
+import com.github.MrMks.skillbar.common.ICondition;
 import com.github.MrMks.skillbar.forge.GameSetting;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBarrier;
-import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagByte;
@@ -52,9 +49,11 @@ public class Manager {
         if (id < 0) enable.set(false);
     }
 
+    /*
     public static int getActiveId(){
         return activeId.get();
     }
+     */
 
     public static Manager prepareManager(int id){
         synchronized (map){
@@ -72,7 +71,20 @@ public class Manager {
             map.clear();
             activeId.set(-1);
             enable.set(false);
+            condition = null;
         }
+    }
+
+    private static ICondition condition;
+    public static boolean isInCondition(){
+        return condition != null;
+    }
+    public static void leaveCondition(){
+        condition = null;
+        getManager().barMap.clear();
+    }
+    public static void enterCondition(ICondition c){
+        condition = c;
     }
 
     //private static List<Integer> freeList = new ArrayList<>();
@@ -159,6 +171,7 @@ public class Manager {
         }
     }
 
+    /*
     public String getSkillDisplayName(String key){
         ForgeSkillInfo info = skillMap.get(key);
         if (info == null) return key;
@@ -167,6 +180,7 @@ public class Manager {
             return name.substring(2,name.lastIndexOf("=") - 4);
         }
     }
+     */
 
     /**
      *
@@ -180,11 +194,13 @@ public class Manager {
     public boolean setBarMap(Map<Integer, String> nMap, boolean forceSet){
         if (isEmpty()) return false;
         synchronized (barMap){
-            if (!forceSet && ConditionManager.isAllowFree()) {
-                List<Integer> list = new ArrayList<>(nMap.keySet());
-                list.removeIf(key->ConditionManager.getFreeList().contains(key));
-                list.forEach(key->{
-                    if (barMap.containsKey(key)) nMap.put(key,barMap.get(key));
+            if (!forceSet && isInCondition() && condition.isEnableFix()) {
+                Set<Integer> set = new HashSet<>(condition.getFixMap().keySet());
+                set.addAll(nMap.keySet());
+                set.removeIf(key->condition.getFreeList().contains(key) || (condition.getFreeList().contains(-1)));
+                set.forEach(key->{
+                    if (barMap.containsKey(key)) nMap.put(key, barMap.get(key));
+                    if (condition.getFixMap().containsKey(key)) nMap.put(key, condition.getFixMap().get(key));
                     else nMap.remove(key);
                 });
             }
@@ -203,6 +219,10 @@ public class Manager {
         }
     }
 
+    public int getBarSize(){
+        return isInCondition() ? condition.getBarSize() : GameSetting.getInstance().getMaxBarPage();
+    }
+
     public String getKeyInBar(int i) {
         if (isEmpty()) return null;
         synchronized (barMap){
@@ -214,6 +234,8 @@ public class Manager {
         return new HashMap<>(barMap);
     }
 
+    private static final Item item = Item.getByNameOrId("minecraft:barrier");
+    private static final ItemStack fixedSlot = item == null ? ItemStack.EMPTY : new ItemStack(item,1,0);
     public synchronized Map<Integer, ItemStack> getBarIconMap(){
         Map<Integer, ItemStack> rIconMap = new HashMap<>();
         if (isEmpty()) return rIconMap;
@@ -260,11 +282,10 @@ public class Manager {
             }
         }
         for (Integer o : list) barMap.remove(o);
-        if (ConditionManager.isFix()) {
-            ItemStack fixedSlot = new ItemStack(Item.getByNameOrId("minecraft:barrier"));
+        if (isInCondition() && condition.isEnableFix()) {
             fixedSlot.setTagInfo("fix", new NBTTagByte((byte) 0));
-            for (int index = 0;index < GameSetting.getInstance().getMaxBarPage() * 9 + 9;index++)
-                if (!barMap.containsKey(index) && !ConditionManager.getFreeList().contains(index))
+            for (int index = 0;index < condition.getBarSize() * 9 + 9;index++)
+                if (!barMap.containsKey(index) && !condition.getFreeList().contains(index) && !condition.getFreeList().contains(-1))
                     rIconMap.put(index,fixedSlot);
         }
         return rIconMap;

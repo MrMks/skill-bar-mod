@@ -27,7 +27,7 @@ public class GuiHandler implements IGuiHandler {
         if (ID == 2) {
             Manager manager = Manager.getManager();
             if (manager.isActive()){
-                return new GuiSkillSettings(new ContainerSkillSetting(manager, setting));
+                return new GuiSkillSettings(new ContainerSkillSetting(manager));
             }
         }
         return null;

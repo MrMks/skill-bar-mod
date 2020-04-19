@@ -44,6 +44,6 @@ public class GameSetting {
     }
 
     public int getMaxBarPage() {
-        return ConditionManager.isActive() ? ConditionManager.getBarSize() : maxPage;
+        return maxPage;
     }
 }

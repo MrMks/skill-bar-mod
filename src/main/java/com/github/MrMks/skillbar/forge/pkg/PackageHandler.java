@@ -1,16 +1,16 @@
 package com.github.MrMks.skillbar.forge.pkg;
 
 import com.github.MrMks.skillbar.common.ByteBuilder;
-import com.github.MrMks.skillbar.forge.ConditionManager;
-import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.common.ByteDecoder;
 import com.github.MrMks.skillbar.common.PartMerge;
 import com.github.MrMks.skillbar.common.SkillInfo;
 import com.github.MrMks.skillbar.common.handler.IClientHandler;
 import com.github.MrMks.skillbar.common.pkg.CPackage;
 import com.github.MrMks.skillbar.common.pkg.SPackage;
-import com.github.MrMks.skillbar.forge.skill.Manager;
+import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.forge.skill.Condition;
 import com.github.MrMks.skillbar.forge.skill.ForgeSkillInfo;
+import com.github.MrMks.skillbar.forge.skill.Manager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -126,7 +126,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     @Override
     public void onDiscover(int version) {
-        if (version == VERSION) PackageSender.send(CPackage.BUILDER.buildDiscover(ForgeByteBuilder::new));
+        PackageSender.send(CPackage.BUILDER.buildDiscover(ForgeByteBuilder::new));
     }
 
     @Override
@@ -151,9 +151,8 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         synchronized (manager = Manager.prepareManager(activeId)){
             queue.clear();
             if (manager.isListSkill(skillSize)) queue.add(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
-            if (manager.isListBar() || conditionSwitch) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
+            if (manager.isListBar()) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
             if (Manager.isEnable()) while (!queue.isEmpty()) PackageSender.send(queue.poll());
-            conditionSwitch = false;
         }
     }
 
@@ -172,7 +171,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onListSkill(List<SkillInfo> aList, List<CharSequence> reList) {
+    public void onListSkill(List<SkillInfo> aList, List<String> reList) {
         Manager manager;
         ArrayList<ForgeSkillInfo> infos = new ArrayList<>();
         for (SkillInfo info : aList) infos.add(new ForgeSkillInfo(info));
@@ -215,26 +214,21 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onListBar(Map<Integer, CharSequence> map) {
+    public void onListBar(Map<Integer, String> map) {
         Manager manager = Manager.getManager();
         if (manager.isActive()){
-            Map<Integer,String> nMap = new HashMap<>();
-            for (Map.Entry<Integer, CharSequence> entry: map.entrySet()) nMap.put(entry.getKey(), entry.getValue().toString());
-            manager.setBarMap(nMap,true);
+            manager.setBarMap(map,true);
         }
     }
 
-    private boolean conditionSwitch = false;
     @Override
-    public void onEnterCondition(CharSequence key, int size, boolean fix, boolean free, List<Integer> freeSlots) {
-        ConditionManager.enter(key.toString(),size,fix, free, freeSlots);
-        conditionSwitch = true;
+    public void onEnterCondition(int size, boolean fix, boolean free, Map<Integer, String> map, List<Integer> freeSlots) {
+        Manager.enterCondition(new Condition(size,fix,free,map,freeSlots));
     }
 
     @Override
-    public void onLeaveCondition(CharSequence key) {
-        ConditionManager.leave();
-        conditionSwitch = true;
+    public void onLeaveCondition() {
+        Manager.leaveCondition();
     }
 
     @Override
@@ -251,12 +245,12 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onCast(CharSequence key, boolean exist, boolean suc, byte code) {
+    public void onCast(String key, boolean exist, boolean suc, byte code) {
         if (!suc){
             switch (code) {
                 case CAST_FAILED_NO_SKILL:
                     Manager manager = Manager.getManager();
-                    if (manager.isActive()) manager.removeSkill(key.toString());
+                    if (manager.isActive()) manager.removeSkill(key);
                     break;
                 case CAST_FAILED_UNLOCK:
                 case CAST_FAILED_COOLDOWN:
@@ -267,11 +261,11 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onCoolDown(Map<CharSequence, Integer> map) {
+    public void onCoolDown(Map<String, Integer> map) {
         Manager manager = Manager.getManager();
         if (manager.isActive()){
             HashMap<String, Integer> nMap = new HashMap<>();
-            for (Map.Entry<CharSequence, Integer> entry : map.entrySet()) nMap.put(entry.getKey().toString(), entry.getValue());
+            for (Map.Entry<String, Integer> entry : map.entrySet()) nMap.put(entry.getKey(), entry.getValue());
             manager.setCoolDown(nMap);
         }
     }

@@ -30,7 +30,7 @@ public class GuiSkillBar extends GuiIngame {
         ir = mc.getRenderItem();
         this.zLevel = -100.0f;
 
-        init(manager, setting.getBarPage(), setting.getMaxBarPage());
+        init(manager, setting.getBarPage(), manager.getBarSize());
     }
 
     private List<ItemStack> ics = new ArrayList<>();

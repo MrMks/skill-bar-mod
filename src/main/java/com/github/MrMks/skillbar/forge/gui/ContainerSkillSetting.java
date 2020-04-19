@@ -1,6 +1,5 @@
 package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.common.pkg.CPackage;
 import com.github.MrMks.skillbar.forge.pkg.ForgeByteBuilder;
 import com.github.MrMks.skillbar.forge.pkg.PackageSender;
@@ -32,12 +31,12 @@ public class ContainerSkillSetting extends Container {
     private Map<Integer, ItemStack> iconMap;
     private Manager manager;
 
-    public ContainerSkillSetting(Manager manager, GameSetting setting){
+    public ContainerSkillSetting(Manager manager){
         this.manager = manager;
         this.enabled = manager.getShowSkillList();
         this.map = manager.getBarMap();
         this.iconMap = manager.getBarIconMap();
-        this.barPageMax = setting.getMaxBarPage();
+        this.barPageMax = manager.getBarSize();
         listToFull();
         listToSlc();
         int i;
@@ -74,7 +73,7 @@ public class ContainerSkillSetting extends Container {
             if (slot != null){
                 ItemStack item = slot.getStack();
                 ItemStack mItem = inventoryPlayer.getItemStack();
-                if (item.hasTagCompound() && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
+                if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
                 if (dragType == 1){
                     if (!mItem.isEmpty()){
                         inventoryPlayer.setItemStack(ItemStack.EMPTY);
