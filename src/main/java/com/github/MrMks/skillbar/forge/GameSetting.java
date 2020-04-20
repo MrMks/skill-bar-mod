@@ -1,5 +1,7 @@
 package com.github.MrMks.skillbar.forge;
 
+import com.github.MrMks.skillbar.forge.skill.Manager;
+
 /**
  * This class is response to save all gaming settings;
  */
@@ -32,7 +34,7 @@ public class GameSetting {
     private int barPage = 0;
     private int maxPage = 2;
     public void setBarPage(int nP){
-        barPage = Math.min(Math.max(0,nP),maxPage);
+        barPage = Math.min(Math.max(0,nP), Manager.getManager().getBarSize());
     }
 
     public int getBarPage(){

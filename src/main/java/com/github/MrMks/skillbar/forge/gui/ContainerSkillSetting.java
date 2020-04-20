@@ -179,7 +179,7 @@ public class ContainerSkillSetting extends Container {
                 iconMap.put(i + barPageNow * 9, stack);
             } else {
                 map.remove(i + barPageNow * 9);
-                iconMap.remove(i + barPageNow * 9);
+                if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("fix")) iconMap.remove(i + barPageNow * 9);
             }
         }
     }

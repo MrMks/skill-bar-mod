@@ -223,12 +223,14 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     @Override
     public void onEnterCondition(int size, boolean fix, boolean free, Map<Integer, String> map, List<Integer> freeSlots) {
+        GameSetting.getInstance().setBarPage(0);
         Manager.enterCondition(new Condition(size,fix,free,map,freeSlots));
     }
 
     @Override
     public void onLeaveCondition() {
         Manager.leaveCondition();
+        GameSetting.getInstance().setBarPage(0);
     }
 
     @Override

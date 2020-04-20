@@ -130,7 +130,8 @@ public class Manager {
     public boolean isListSkill(int size){
         if (isEmpty()) return false;
         synchronized (skillMap){
-            return skillMap.size() != size;
+            if (condition != null) return !condition.isEnableFix() || condition.isEnableFree();
+            else return skillMap.size() != size;
         }
     }
 
@@ -240,6 +241,7 @@ public class Manager {
         Map<Integer, ItemStack> rIconMap = new HashMap<>();
         if (isEmpty()) return rIconMap;
         ArrayList<Integer> list = new ArrayList<>(9);
+        fixedSlot.setTagInfo("fix", new NBTTagByte((byte) 0));
         for (Map.Entry<Integer, String> entry : barMap.entrySet()){
             int index = entry.getKey();
             String key = entry.getValue();
@@ -285,8 +287,8 @@ public class Manager {
         if (isInCondition() && condition.isEnableFix()) {
             fixedSlot.setTagInfo("fix", new NBTTagByte((byte) 0));
             for (int index = 0;index < condition.getBarSize() * 9 + 9;index++)
-                if (!barMap.containsKey(index) && !condition.getFreeList().contains(index) && !condition.getFreeList().contains(-1))
-                    rIconMap.put(index,fixedSlot);
+                if ((!barMap.containsKey(index) || condition.getFixMap().containsKey(index))&& !condition.getFreeList().contains(index) && !condition.getFreeList().contains(-1))
+                    rIconMap.putIfAbsent(index,fixedSlot);
         }
         return rIconMap;
     }
@@ -294,6 +296,12 @@ public class Manager {
     public boolean isListBar(){
         if (isEmpty()) return false;
         synchronized (barMap){
+            if (isInCondition()) {
+                if (condition.isEnableFix() && !condition.isEnableFree()) {
+                    setBarMap(new HashMap<>(condition.getFixMap()));
+                    return false;
+                }
+            }
             return barMap.isEmpty();
         }
     }
