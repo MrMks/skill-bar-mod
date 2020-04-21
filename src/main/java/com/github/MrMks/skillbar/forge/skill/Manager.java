@@ -1,7 +1,6 @@
 package com.github.MrMks.skillbar.forge.skill;
 
 import com.github.MrMks.skillbar.common.ICondition;
-import com.github.MrMks.skillbar.forge.GameSetting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagByte;
@@ -218,10 +217,6 @@ public class Manager {
             }
             return !flag;
         }
-    }
-
-    public int getBarSize(){
-        return isInCondition() ? condition.getBarSize() : GameSetting.getInstance().getMaxBarPage();
     }
 
     public String getKeyInBar(int i) {

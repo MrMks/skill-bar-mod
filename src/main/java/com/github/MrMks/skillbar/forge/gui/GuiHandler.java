@@ -1,6 +1,5 @@
 package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -10,10 +9,7 @@ import javax.annotation.Nullable;
 
 public class GuiHandler implements IGuiHandler {
 
-    private GameSetting setting;
-    public GuiHandler(GameSetting setting){
-        this.setting = setting;
-    }
+    public GuiHandler(){}
 
     @Nullable
     @Override

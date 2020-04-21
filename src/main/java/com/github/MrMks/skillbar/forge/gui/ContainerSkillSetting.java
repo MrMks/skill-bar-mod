@@ -3,6 +3,7 @@ package com.github.MrMks.skillbar.forge.gui;
 import com.github.MrMks.skillbar.common.pkg.CPackage;
 import com.github.MrMks.skillbar.forge.pkg.ForgeByteBuilder;
 import com.github.MrMks.skillbar.forge.pkg.PackageSender;
+import com.github.MrMks.skillbar.forge.setting.ServerSetting;
 import com.github.MrMks.skillbar.forge.skill.Manager;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,7 +37,7 @@ public class ContainerSkillSetting extends Container {
         this.enabled = manager.getShowSkillList();
         this.map = manager.getBarMap();
         this.iconMap = manager.getBarIconMap();
-        this.barPageMax = manager.getBarSize();
+        this.barPageMax = ServerSetting.getInstance().getMaxSize();
         listToFull();
         listToSlc();
         int i;

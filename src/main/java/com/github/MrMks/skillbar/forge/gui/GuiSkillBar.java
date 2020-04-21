@@ -1,7 +1,8 @@
 package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.forge.KeyManager;
+import com.github.MrMks.skillbar.forge.setting.ClientSetting;
+import com.github.MrMks.skillbar.forge.setting.ServerSetting;
 import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -24,13 +25,13 @@ public class GuiSkillBar extends GuiIngame {
 
     private FontRenderer fr;
     private RenderItem ir;
-    public GuiSkillBar(Manager manager, GameSetting setting){
+    public GuiSkillBar(Manager manager){
         super(Minecraft.getMinecraft());
         fr = getFontRenderer();
         ir = mc.getRenderItem();
         this.zLevel = -100.0f;
 
-        init(manager, setting.getBarPage(), manager.getBarSize());
+        init(manager, ClientSetting.getInstance().getSize(), ServerSetting.getInstance().getMaxSize());
     }
 
     private List<ItemStack> ics = new ArrayList<>();

@@ -1,7 +1,7 @@
 package com.github.MrMks.skillbar.forge.listener;
 
-import com.github.MrMks.skillbar.forge.GameSetting;
 import com.github.MrMks.skillbar.forge.gui.GuiSkillBar;
+import com.github.MrMks.skillbar.forge.setting.ClientSetting;
 import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -13,9 +13,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 public class MainListener {
-    private GameSetting setting;
-    public MainListener(GameSetting setting){
-        this.setting = setting;
+    //private GameSetting setting;
+    private ClientSetting setting;
+    public MainListener(){
+        this.setting = ClientSetting.getInstance();
     }
 
     // handle playerDisconnect when player is disconnected by channel close but did not receive disconnect package
@@ -23,7 +24,7 @@ public class MainListener {
     public void onWorldUnload(WorldEvent.Unload event){
         NetHandlerPlayClient client = Minecraft.getMinecraft().getConnection();
         if (client == null || !client.getNetworkManager().isChannelOpen()) {
-            if (setting.isHide()) setting.toggle();
+            setting.setHide(true);
             Manager.clean();
         }
     }
@@ -31,7 +32,7 @@ public class MainListener {
     // handle playerDisconnect
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPlayerDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
-        GameSetting.clean();
+        ClientSetting.clean();
         Manager.clean();
     }
 
@@ -44,7 +45,7 @@ public class MainListener {
         if (e.getType() == RenderGameOverlayEvent.ElementType.HOTBAR){
             Manager manager = Manager.getManager();
             if (manager.isActive()) {
-                new GuiSkillBar(manager, setting).render(e.getResolution());
+                new GuiSkillBar(manager).render(e.getResolution());
             }
         }
     }

@@ -7,7 +7,8 @@ import com.github.MrMks.skillbar.common.SkillInfo;
 import com.github.MrMks.skillbar.common.handler.IClientHandler;
 import com.github.MrMks.skillbar.common.pkg.CPackage;
 import com.github.MrMks.skillbar.common.pkg.SPackage;
-import com.github.MrMks.skillbar.forge.GameSetting;
+import com.github.MrMks.skillbar.forge.setting.ClientSetting;
+import com.github.MrMks.skillbar.forge.setting.ServerSetting;
 import com.github.MrMks.skillbar.forge.skill.Condition;
 import com.github.MrMks.skillbar.forge.skill.ForgeSkillInfo;
 import com.github.MrMks.skillbar.forge.skill.Manager;
@@ -131,7 +132,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     @Override
     public void onSetting(int maxSize) {
-        GameSetting.getInstance().setMaxBarPage(maxSize);
+        ServerSetting.buildDefault(maxSize);
     }
 
     private final Queue<ByteBuilder> queue = new LinkedList<>();
@@ -223,14 +224,14 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     @Override
     public void onEnterCondition(int size, boolean fix, boolean free, Map<Integer, String> map, List<Integer> freeSlots) {
-        GameSetting.getInstance().setBarPage(0);
+        ClientSetting.getInstance().setSize(0);
         Manager.enterCondition(new Condition(size,fix,free,map,freeSlots));
     }
 
     @Override
     public void onLeaveCondition() {
         Manager.leaveCondition();
-        GameSetting.getInstance().setBarPage(0);
+        ServerSetting.getInstance().setMaxSize(-1);
     }
 
     @Override

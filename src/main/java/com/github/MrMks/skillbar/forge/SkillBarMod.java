@@ -19,20 +19,17 @@ import net.minecraftforge.fml.relauncher.Side;
 public class SkillBarMod {
     @Mod.EventHandler
     public void postInit(FMLInitializationEvent e){
-        // GameSetting generate;
-        GameSetting setting = GameSetting.getInstance();
-
         // KeyBinding registry
         KeyManager.register();
 
         // Listener registry
-        MinecraftForge.EVENT_BUS.register(new MainListener(setting));
-        MinecraftForge.EVENT_BUS.register(new KeyListener(this,setting));
+        MinecraftForge.EVENT_BUS.register(new MainListener());
+        MinecraftForge.EVENT_BUS.register(new KeyListener(this));
 
         // NetWrapper registry
         SimpleNetworkWrapper wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.CHANNEL_NAME);
         wrapper.registerMessage(new PackageHandler(),PackageMessage.class,Constants.DISCRIMINATOR, Side.CLIENT);
         PackageSender.setWrapper(wrapper);
-        NetworkRegistry.INSTANCE.registerGuiHandler(this,new GuiHandler(setting));
+        NetworkRegistry.INSTANCE.registerGuiHandler(this,new GuiHandler());
     }
 }
