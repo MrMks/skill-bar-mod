@@ -2,7 +2,6 @@ package com.github.MrMks.skillbar.forge.listener;
 
 import com.github.MrMks.skillbar.common.pkg.CPackage;
 import com.github.MrMks.skillbar.forge.KeyManager;
-import com.github.MrMks.skillbar.forge.pkg.ForgeByteBuilder;
 import com.github.MrMks.skillbar.forge.pkg.PackageSender;
 import com.github.MrMks.skillbar.forge.setting.ClientSetting;
 import com.github.MrMks.skillbar.forge.skill.Manager;
@@ -27,7 +26,7 @@ public class KeyListener {
         Manager manager = Manager.getManager();
         if (!manager.isActive()) return;
         if (KeyManager.getToggleKey().isPressed()){
-            setting.setHide(setting.isHide());
+            setting.setHide(!setting.isHide());
         } else if (KeyManager.getSettingKey().isPressed()){
             Minecraft.getMinecraft().player.openGui(mod,2,Minecraft.getMinecraft().player.world,0,0,0);
         } else if (KeyManager.getBarPageUpKey().isPressed()) {
@@ -40,7 +39,7 @@ public class KeyListener {
                 if (keys.get(i).isPressed()){
                     String key = manager.getKeyInBar(i + setting.getSize() * 9);
                     if (key != null && !key.isEmpty()) {
-                        PackageSender.send(CPackage.BUILDER.buildCast(ForgeByteBuilder::new, key));
+                        PackageSender.send(CPackage.BUILDER.buildCast(key));
                         break;
                     }
                 }

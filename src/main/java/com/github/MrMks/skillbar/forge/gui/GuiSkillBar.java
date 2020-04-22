@@ -35,16 +35,22 @@ public class GuiSkillBar extends GuiIngame {
     }
 
     private List<ItemStack> ics = new ArrayList<>();
+    private List<Integer> cds = new ArrayList<>();
     private String pageStr;
     private void init(@Nonnull Manager manager, int page, int max){
         if (manager.isActive()) {
             ics.clear();
+            cds.clear();
             Map<Integer, ItemStack> map = manager.getBarIconMap();
+            Map<Integer, Integer> cdMap = manager.getCoolDownMap();
             for (int i = 0; i < 9; i++){
                 ics.add(map.getOrDefault(i + page * 9, ItemStack.EMPTY));
+                cds.add(cdMap.getOrDefault(i + page * 9, 0));
             }
+        } else {
+            ics.clear();
+            cds.clear();
         }
-        else ics.clear();
         pageStr = String.format("(%d/%d)",page + 1, max + 1);
     }
 
@@ -88,28 +94,27 @@ public class GuiSkillBar extends GuiIngame {
 
         int xBase = sr.getScaledWidth() / 2 - 91;
         int yBase = sr.getScaledHeight() - 43;
-        int count = 0;
-        for (ItemStack stack : ics){
-            if (stack.isEmpty()) {
-                count ++;
-                continue;
-            }
-            int x = xBase + 3 + count * 20;
+        for (int i = 0; i < 9; i++) {
+            if (ics.get(i) == null) continue;
+            ItemStack stack = ics.get(i);
+            Integer cd = cds.get(i);
+            if (cd == null) cd = 0;
+
+            int x = xBase + 3 + i * 20;
             int y = yBase + 3;
             RenderHelper.enableGUIStandardItemLighting();
             ir.renderItemIntoGUI(stack, x, y);
-            if (stack.getCount() > 1) {
-                String s = String.valueOf(stack.getCount());
+            if (cd > 0) {
+                String s = String.valueOf(cd);
                 fr.drawStringWithShadow(s, (x + 19 - 2 - fr.getStringWidth(s)), (y + 6 + 3),16777215);
             }
-            String keyboard = KeyManager.getHotKeys().get(count).getDisplayName();
+            String keyboard = KeyManager.getHotKeys().get(i).getDisplayName();
             if (!keyboard.isEmpty()){
                 keyboard = keyboard.replace("CTRL + ", "C").replace("SHIFT + ", "S").replace("ALT + ", "A");
                 x = x - 2;
                 y = y - 4;
                 fr.drawStringWithShadow(keyboard, x, y, 0xDAA520);
             }
-            count++;
         }
         ir.zLevel = ir_z;
     }

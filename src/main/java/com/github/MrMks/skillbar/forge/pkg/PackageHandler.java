@@ -1,6 +1,5 @@
 package com.github.MrMks.skillbar.forge.pkg;
 
-import com.github.MrMks.skillbar.common.ByteBuilder;
 import com.github.MrMks.skillbar.common.ByteDecoder;
 import com.github.MrMks.skillbar.common.PartMerge;
 import com.github.MrMks.skillbar.common.SkillInfo;
@@ -21,8 +20,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.*;
-
-import static com.github.MrMks.skillbar.common.Constants.*;
 
 /**
  * This class response to handle messages from server plugin;
@@ -58,68 +55,62 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         if (buf != null){
             ByteDecoder dec = new ByteDecoder(buf);
             switch (dec.getHeader()){
-                case DISCOVER:
+                case Discover:
                     SPackage.DECODER.decodeDiscover(this,dec);
                     //onDiscover(dec);
                     break;
-                case ENABLE:
+                case Enable:
                     SPackage.DECODER.decodeEnable(this,dec);
                     //onEnable(dec);
                     break;
-                case SETTING:
+                case Setting:
                     SPackage.DECODER.decodeSetting(this,dec);
                     //onSetting(dec);
                     break;
-                case ACCOUNT:
+                case Account:
                     SPackage.DECODER.decodeAccount(this,dec);
                     // onAccount(dec);
                     break;
-                case DISABLE:
+                case Disable:
                     SPackage.DECODER.decodeDisable(this,dec);
                     // onDisable();
                     break;
-                case ENFORCE_LIST_SKILL:
-                    SPackage.DECODER.decodeEnforceListSkill(this,dec);
-                    //onEnforceListSkill(dec);
-                    break;
-                case LIST_SKILL:
+                case ListSkill:
                     SPackage.DECODER.decodeListSkill(this,dec);
                     //onListSkill(dec);
                     break;
-                case ENFORCE_UPDATE_SKILL:
-                    SPackage.DECODER.decodeEnforceUpdateSkill(this,dec);
-                    //onEnforceUpdateSKill(dec);
-                    break;
-                case UPDATE_SKILL:
+                case UpdateSkill:
                     SPackage.DECODER.decodeUpdateSkill(this,dec);
                     //onUpdateSkill(dec);
                     break;
-                case CAST:
+                case Cast:
                     SPackage.DECODER.decodeCast(this,dec);
                     //onCast(dec);
                     break;
-                case COOLDOWN:
+                case CoolDown:
                     SPackage.DECODER.decodeCoolDown(this,dec);
                     //onCoolDown(dec);
                     break;
-                case ADD_SKILL:
+                case AddSkill:
                     SPackage.DECODER.decodeAddSkill(this,dec);
                     //onAddSkill(dec);
                     break;
-                case LIST_BAR:
+                case ListBar:
                     SPackage.DECODER.decodeListBar(this,dec);
                     //onListBar(dec);
                     break;
-                case CLEAN:
+                case Clean:
                     SPackage.DECODER.decodeCleanUp(this,dec);
                     //onClean(dec);
                     break;
-                case ENTER_CONDITION:
+                case EnterCondition:
                     SPackage.DECODER.decodeEnterCondition(this,dec);
                     break;
-                case LEAVE_CONDITION:
+                case LeaveCondition:
                     SPackage.DECODER.decodeLeaveCondition(this,dec);
                     break;
+                case RemoveSkill:
+                    SPackage.DECODER.decodeRemoveSkill(this,dec);
             }
         }
         return null;
@@ -127,7 +118,7 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
 
     @Override
     public void onDiscover(int version) {
-        PackageSender.send(CPackage.BUILDER.buildDiscover(ForgeByteBuilder::new));
+        PackageSender.send(CPackage.BUILDER.buildDiscover());
     }
 
     @Override
@@ -135,26 +126,25 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
         ServerSetting.buildDefault(maxSize);
     }
 
-    private final Queue<ByteBuilder> queue = new LinkedList<>();
     @Override
     public void onEnable() {
         if (!Manager.isEnable()) {
             Manager.setEnable(true);
-            while (!queue.isEmpty()) PackageSender.send(queue.poll());
-            Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
+            Manager manager;
+            synchronized (manager = Manager.getManager()) {
+                if (manager.isListSkill()) PackageSender.send(CPackage.BUILDER.buildListSkill(manager.getSkillKeyList()));
+                if (manager.isListBar()) PackageSender.send(CPackage.BUILDER.buildListBar());
+                if (manager.isActive()) {
+                    Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
+                }
+            }
         }
     }
 
     @Override
-    public void onAccount(int activeId, int skillSize) {
-        Manager manager;
+    public void onAccount(int activeId) {
         Manager.setActiveId(activeId);
-        synchronized (manager = Manager.prepareManager(activeId)){
-            queue.clear();
-            if (manager.isListSkill(skillSize)) queue.add(CPackage.BUILDER.buildListSkill(ForgeByteBuilder::new,manager.getSkillKeyList()));
-            if (manager.isListBar()) queue.add(CPackage.BUILDER.buildListBar(ForgeByteBuilder::new));
-            if (Manager.isEnable()) while (!queue.isEmpty()) PackageSender.send(queue.poll());
-        }
+        Manager.prepareManager(activeId);
     }
 
     @Override
@@ -172,22 +162,30 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onListSkill(List<SkillInfo> aList, List<String> reList) {
+    public void onListSkill(List<SkillInfo> aList) {
         Manager manager;
         ArrayList<ForgeSkillInfo> infos = new ArrayList<>();
         for (SkillInfo info : aList) infos.add(new ForgeSkillInfo(info));
         synchronized (manager = Manager.getManager()){
-            if (manager.isActive()) manager.setSkillMap(infos, reList);
+            manager.setSkillMap(infos);
         }
     }
 
     @Override
-    public void onEnforceListSkill(int id, List<SkillInfo> list) {
-        Manager manager = Manager.getManager(id);
-        if (manager != null && manager.getId() > 0){
-            ArrayList<ForgeSkillInfo> infos = new ArrayList<>();
-            for (SkillInfo info : list) infos.add(new ForgeSkillInfo(info));
-            manager.setSkillMap(infos);
+    public void onAddSkill(List<SkillInfo> list) {
+        Manager manager;
+        List<ForgeSkillInfo> infos = new ArrayList<>();
+        list.forEach(info -> infos.add(new ForgeSkillInfo(info)));
+        synchronized (manager = Manager.getManager()) {
+            manager.setSkillMap(infos, Collections.emptyList());
+        }
+    }
+
+    @Override
+    public void onRemoveSkill(List<String> list) {
+        Manager manager;
+        synchronized (manager = Manager.getManager()) {
+            manager.setSkillMap(Collections.emptyList(), list);
         }
     }
 
@@ -202,22 +200,9 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onEnforceUpdateSKill(int id, SkillInfo info) {
-        if (info.isExist()) {
-            Manager manager = Manager.getManager(id);
-            if (manager != null && manager.getId() > 0) manager.addSkill(new ForgeSkillInfo(info));
-        }
-    }
-
-    @Override
-    public void onAddSkill(List<SkillInfo> list) {
-        onListSkill(list, Collections.emptyList());
-    }
-
-    @Override
     public void onListBar(Map<Integer, String> map) {
-        Manager manager = Manager.getManager();
-        if (manager.isActive()){
+        Manager manager;
+        synchronized (manager = Manager.getManager()){
             manager.setBarMap(map,true);
         }
     }
@@ -226,41 +211,19 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     public void onEnterCondition(int size, boolean fix, boolean free, Map<Integer, String> map, List<Integer> freeSlots) {
         ClientSetting.getInstance().setSize(0);
         Manager.enterCondition(new Condition(size,fix,free,map,freeSlots));
+        ServerSetting.getInstance().setMaxSize(size);
     }
 
     @Override
     public void onLeaveCondition() {
+        ClientSetting.getInstance().setSize(0);
         Manager.leaveCondition();
         ServerSetting.getInstance().setMaxSize(-1);
     }
 
     @Override
-    @Deprecated
-    public void onFixBar(boolean fix) {
-        //GameSetting.getInstance().setFixBar(fix);
-        //if (!fix) Manager.clearFreeList();
-    }
-
-    @Override
-    @Deprecated
-    public void onFreeSlot(List<Integer> list) {
-        //Manager.setFreeList(list);
-    }
-
-    @Override
-    public void onCast(String key, boolean exist, boolean suc, byte code) {
-        if (!suc){
-            switch (code) {
-                case CAST_FAILED_NO_SKILL:
-                    Manager manager = Manager.getManager();
-                    if (manager.isActive()) manager.removeSkill(key);
-                    break;
-                case CAST_FAILED_UNLOCK:
-                case CAST_FAILED_COOLDOWN:
-                    break;
-                default:
-            }
-        }
+    public void onCast(String key, boolean exist, boolean suc) {
+        if (!exist) Manager.getManager().removeSkill(key);
     }
 
     @Override

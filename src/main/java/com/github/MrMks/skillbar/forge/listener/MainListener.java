@@ -24,7 +24,7 @@ public class MainListener {
     public void onWorldUnload(WorldEvent.Unload event){
         NetHandlerPlayClient client = Minecraft.getMinecraft().getConnection();
         if (client == null || !client.getNetworkManager().isChannelOpen()) {
-            setting.setHide(true);
+            setting.setHide(false);
             Manager.clean();
         }
     }

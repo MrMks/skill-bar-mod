@@ -1,7 +1,6 @@
 package com.github.MrMks.skillbar.forge.gui;
 
 import com.github.MrMks.skillbar.common.pkg.CPackage;
-import com.github.MrMks.skillbar.forge.pkg.ForgeByteBuilder;
 import com.github.MrMks.skillbar.forge.pkg.PackageSender;
 import com.github.MrMks.skillbar.forge.setting.ServerSetting;
 import com.github.MrMks.skillbar.forge.skill.Manager;
@@ -61,7 +60,7 @@ public class ContainerSkillSetting extends Container {
         //super.onContainerClosed(playerIn);
         slcToMap();
         if (manager.setBarMap(map)) {
-            PackageSender.send(CPackage.BUILDER.buildSaveBar(ForgeByteBuilder::new, map));
+            PackageSender.send(CPackage.BUILDER.buildSaveBar(map));
         }
     }
 

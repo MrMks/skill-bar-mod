@@ -126,11 +126,11 @@ public class Manager {
         }
     }
 
-    public boolean isListSkill(int size){
+    public boolean isListSkill(){
         if (isEmpty()) return false;
         synchronized (skillMap){
             if (condition != null) return !condition.isEnableFix() || condition.isEnableFree();
-            else return skillMap.size() != size;
+            else return skillMap.isEmpty();
         }
     }
 
@@ -269,11 +269,6 @@ public class Manager {
                 }
             }
             if (icon != null){
-                int cd = cdMap.getOrDefault(key, 0) + 1;
-                if (cd == 1) {
-                    cdMap.remove(key);
-                }
-                icon.setCount(cd);
                 iconCache.put(key, icon);
                 rIconMap.put(index, icon);
             }
@@ -286,6 +281,16 @@ public class Manager {
                     rIconMap.putIfAbsent(index,fixedSlot);
         }
         return rIconMap;
+    }
+
+    public Map<Integer, Integer> getCoolDownMap(){
+        Map<Integer, Integer> map = new HashMap<>();
+        barMap.forEach((key, value)->{
+            int cd = cdMap.getOrDefault(value,0);
+            if (cd > 0) map.put(key, cd);
+            else cdMap.remove(value);
+        });
+        return map;
     }
 
     public boolean isListBar(){
