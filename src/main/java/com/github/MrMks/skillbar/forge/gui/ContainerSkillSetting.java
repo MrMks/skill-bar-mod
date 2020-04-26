@@ -21,15 +21,15 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class ContainerSkillSetting extends Container {
-    private ItemStackHandler full = new ItemStackHandler(36);
-    private ItemStackHandler slc = new ItemStackHandler(9);
+    private final ItemStackHandler full = new ItemStackHandler(36);
+    private final ItemStackHandler slc = new ItemStackHandler(9);
     private int pageNow = 0;
     private int barPageNow = 0;
-    private int barPageMax;
-    private List<ItemStack> enabled;
-    private Map<Integer, String> map;
-    private Map<Integer, ItemStack> iconMap;
-    private Manager manager;
+    private final int barPageMax;
+    private final List<ItemStack> enabled;
+    private final Map<Integer, String> map;
+    private final Map<Integer, ItemStack> iconMap;
+    private final Manager manager;
 
     public ContainerSkillSetting(Manager manager){
         this.manager = manager;
@@ -67,10 +67,10 @@ public class ContainerSkillSetting extends Container {
     @Override
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
         InventoryPlayer inventoryPlayer = player.inventory;
-        if (slotId < 0 || slotId > 45) inventoryPlayer.setItemStack(ItemStack.EMPTY);
-        else if (clickTypeIn == ClickType.PICKUP){
-            Slot slot = this.inventorySlots.get(slotId);
-            if (slot != null){
+        if (clickTypeIn == ClickType.PICKUP) {
+            if (slotId < 0 || slotId > 45) inventoryPlayer.setItemStack(ItemStack.EMPTY);
+            else {
+                Slot slot = this.inventorySlots.get(slotId);
                 ItemStack item = slot.getStack();
                 ItemStack mItem = inventoryPlayer.getItemStack();
                 if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
@@ -88,6 +88,33 @@ public class ContainerSkillSetting extends Container {
                         if (!mItem.isEmpty()){
                             slot.putStack(mItem);
                             inventoryPlayer.setItemStack(ItemStack.EMPTY);
+                        }
+                    }
+                }
+            }
+        }
+        else if (clickTypeIn == ClickType.QUICK_CRAFT){
+            if (slotId >= 0 && slotId < 46) {
+                Slot slot = this.inventorySlots.get(slotId);
+                if (slot != null){
+                    ItemStack item = slot.getStack();
+                    ItemStack mItem = inventoryPlayer.getItemStack();
+                    if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
+                    if (dragType == 5){
+                        if (!mItem.isEmpty()){
+                            inventoryPlayer.setItemStack(ItemStack.EMPTY);
+                        } else if (!item.isEmpty() && slotId >= 36){
+                            slot.putStack(ItemStack.EMPTY);
+                        }
+                    } else {
+                        if (slotId < 36){
+                            ItemStack i = item.isEmpty() ? ItemStack.EMPTY : item.copy();
+                            inventoryPlayer.setItemStack(i);
+                        } else {
+                            if (!mItem.isEmpty()){
+                                slot.putStack(mItem);
+                                inventoryPlayer.setItemStack(ItemStack.EMPTY);
+                            }
                         }
                     }
                 }
