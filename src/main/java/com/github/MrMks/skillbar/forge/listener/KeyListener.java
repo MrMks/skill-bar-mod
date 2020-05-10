@@ -15,15 +15,14 @@ import java.util.List;
 
 public class KeyListener {
     private Object mod;
-    private ClientSetting setting;
     public KeyListener(Object mod){
         this.mod = mod;
-        this.setting = ClientSetting.getInstance();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onKeyPress(InputEvent.KeyInputEvent event){
         Manager manager = Manager.getManager();
+        ClientSetting setting = ClientSetting.getInstance();
         if (!manager.isActive()) return;
         if (KeyManager.getToggleKey().isPressed()){
             setting.setHide(!setting.isHide());
