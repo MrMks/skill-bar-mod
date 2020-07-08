@@ -4,6 +4,7 @@ import com.github.MrMks.skillbar.common.SkillInfo;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 
@@ -34,6 +35,7 @@ public class ForgeSkillInfo {
         }
         display.setTag("Lore", loreList);
         this.stack.setTagInfo("display", display);
+        this.stack.setTagInfo("HideFlags", new NBTTagInt(63));
     }
 
     public String getKey(){
