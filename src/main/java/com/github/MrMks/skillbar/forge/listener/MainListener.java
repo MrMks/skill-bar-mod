@@ -6,6 +6,8 @@ import com.github.MrMks.skillbar.forge.skill.Manager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -14,17 +16,14 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 public class MainListener {
     //private GameSetting setting;
-    private ClientSetting setting;
-    public MainListener(){
-        this.setting = ClientSetting.getInstance();
-    }
+
 
     // handle playerDisconnect when player is disconnected by channel close but did not receive disconnect package
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onWorldUnload(WorldEvent.Unload event){
         NetHandlerPlayClient client = Minecraft.getMinecraft().getConnection();
         if (client == null || !client.getNetworkManager().isChannelOpen()) {
-            setting.setHide(false);
+            getSetting().setHide(false);
             Manager.clean();
         }
     }
@@ -40,7 +39,11 @@ public class MainListener {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderOverlay(RenderGameOverlayEvent.Post e){
         if (e.isCancelable() && e.isCanceled()) return;
-        if (setting.isHide()) return;
+        if (getSetting().isHide()) return;
+        Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
+        if (!(entity instanceof EntityPlayer)) return;
+        EntityPlayer player = (EntityPlayer) entity;
+        if (player.isSpectator()) return;
 
         if (e.getType() == RenderGameOverlayEvent.ElementType.HOTBAR){
             Manager manager = Manager.getManager();
@@ -52,9 +55,9 @@ public class MainListener {
 
     // translate overlays
     private boolean translated;
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onRenderTranslate(RenderGameOverlayEvent.Pre e){
-        if (!Manager.isEnable() || translated || setting.isHide()) return;
+        if (!Manager.isEnable() || translated || getSetting().isHide()) return;
         RenderGameOverlayEvent.ElementType type = e.getType();
         boolean flag = type == RenderGameOverlayEvent.ElementType.HEALTH
                 || type == RenderGameOverlayEvent.ElementType.FOOD
@@ -83,4 +86,7 @@ public class MainListener {
         }
     }
 
+    private ClientSetting getSetting(){
+        return ClientSetting.getInstance();
+    }
 }

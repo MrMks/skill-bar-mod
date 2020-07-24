@@ -25,7 +25,7 @@ public class KeyListener {
         ClientSetting setting = ClientSetting.getInstance();
         if (!manager.isActive()) return;
         if (KeyManager.getToggleKey().isPressed()){
-            setting.setHide(!setting.isHide());
+            setting.switchHide();
         } else if (KeyManager.getSettingKey().isPressed()){
             Minecraft.getMinecraft().player.openGui(mod,2,Minecraft.getMinecraft().player.world,0,0,0);
         } else if (KeyManager.getBarPageUpKey().isPressed()) {

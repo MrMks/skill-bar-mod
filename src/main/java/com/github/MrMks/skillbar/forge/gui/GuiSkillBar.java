@@ -117,5 +117,8 @@ public class GuiSkillBar extends GuiIngame {
             }
         }
         ir.zLevel = ir_z;
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableBlend();
+        GlStateManager.enableDepth();;
     }
 }

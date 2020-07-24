@@ -10,12 +10,15 @@ public class ClientSetting {
         instance = new ClientSetting();
     }
 
-    private boolean show = true;
+    private boolean hide = false;
     public boolean isHide() {
-        return !show;
+        return hide;
     }
     public void setHide(boolean hide) {
-        this.show = !hide;
+        this.hide = hide;
+    }
+    public void switchHide(){
+        this.hide = !this.hide;
     }
 
     private int size = 0;
