@@ -14,6 +14,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
+import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.HOTBAR;
+
 public class MainListener {
     //private GameSetting setting;
 
@@ -45,7 +47,7 @@ public class MainListener {
         EntityPlayer player = (EntityPlayer) entity;
         if (player.isSpectator()) return;
 
-        if (e.getType() == RenderGameOverlayEvent.ElementType.HOTBAR){
+        if (e.getType() == HOTBAR){
             Manager manager = Manager.getManager();
             if (manager.isActive()) {
                 new GuiSkillBar(manager).render(e.getResolution());
@@ -59,30 +61,32 @@ public class MainListener {
     public void onRenderTranslate(RenderGameOverlayEvent.Pre e){
         if (!Manager.isEnable() || translated || getSetting().isHide()) return;
         RenderGameOverlayEvent.ElementType type = e.getType();
-        boolean flag = type == RenderGameOverlayEvent.ElementType.HEALTH
-                || type == RenderGameOverlayEvent.ElementType.FOOD
-                || type == RenderGameOverlayEvent.ElementType.HEALTHMOUNT
-                || type == RenderGameOverlayEvent.ElementType.EXPERIENCE
-                || type == RenderGameOverlayEvent.ElementType.ARMOR;
-        if (flag){
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0.0, -21.0, 0.0);
-            translated = true;
+        switch (type) {
+            case HEALTH:
+            case ARMOR:
+            case FOOD:
+            case HEALTHMOUNT:
+            case EXPERIENCE:
+            case JUMPBAR:
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(0.0, -21.0, 0.0);
+                translated = true;
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onRenderTranslate(RenderGameOverlayEvent.Post e){
         if (!translated) return;
         RenderGameOverlayEvent.ElementType type = e.getType();
-        boolean flag = type == RenderGameOverlayEvent.ElementType.HEALTH
-                || type == RenderGameOverlayEvent.ElementType.FOOD
-                || type == RenderGameOverlayEvent.ElementType.HEALTHMOUNT
-                || type == RenderGameOverlayEvent.ElementType.EXPERIENCE
-                || type == RenderGameOverlayEvent.ElementType.ARMOR;
-        if (flag){
-            GlStateManager.popMatrix();
-            translated = false;
+        switch (type) {
+            case HEALTH:
+            case FOOD:
+            case HEALTHMOUNT:
+            case EXPERIENCE:
+            case ARMOR:
+            case JUMPBAR:
+                GlStateManager.popMatrix();
+                translated = false;
         }
     }
 
