@@ -129,8 +129,8 @@ public class Manager {
     public boolean isListSkill(){
         if (isEmpty()) return false;
         synchronized (skillMap){
-            if (condition != null) return !condition.isEnableFix() || condition.isEnableFree();
-            else return skillMap.isEmpty();
+            //if (condition != null) return !condition.isEnableFix() || condition.isEnableFree();
+            return skillMap.isEmpty();
         }
     }
 

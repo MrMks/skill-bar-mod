@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-@SuppressWarnings("unused")
 @Mod(modid = "skillbarmod",name = "SkillBar Mod",version = "1.2.6-10-a1", clientSideOnly = true)
 public class SkillBarMod {
     @Mod.EventHandler
@@ -26,7 +25,7 @@ public class SkillBarMod {
 
         // Listener registry
         MinecraftForge.EVENT_BUS.register(new MainListener());
-        MinecraftForge.EVENT_BUS.register(new KeyListener(this));
+        MinecraftForge.EVENT_BUS.register(new KeyListener());
 
         // NetWrapper registry
         CPackage.BUILDER.init(ForgeByteBuilder::new);
