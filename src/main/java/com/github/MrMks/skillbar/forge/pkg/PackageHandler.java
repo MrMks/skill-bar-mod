@@ -3,14 +3,11 @@ package com.github.MrMks.skillbar.forge.pkg;
 import com.github.MrMks.skillbar.common.ByteDecoder;
 import com.github.MrMks.skillbar.common.PartMerge;
 import com.github.MrMks.skillbar.common.SkillInfo;
+import com.github.MrMks.skillbar.common.enums.CleanType;
 import com.github.MrMks.skillbar.common.handler.IClientHandler;
 import com.github.MrMks.skillbar.common.pkg.CPackage;
 import com.github.MrMks.skillbar.common.pkg.SPackage;
-import com.github.MrMks.skillbar.forge.setting.ClientSetting;
-import com.github.MrMks.skillbar.forge.setting.ServerSetting;
-import com.github.MrMks.skillbar.forge.skill.Condition;
-import com.github.MrMks.skillbar.forge.skill.ForgeSkillInfo;
-import com.github.MrMks.skillbar.forge.skill.Manager;
+import com.github.MrMks.skillbar.forge.BarControl;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -19,7 +16,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.github.MrMks.skillbar.forge.pkg.PackageSender.send;
 
 /**
  * This class response to handle messages from server plugin;
@@ -28,6 +29,11 @@ import java.util.*;
  */
 public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>, IClientHandler {
     private final HashMap<Byte,PartMerge> partMap = new HashMap<>();
+
+    private final BarControl control;
+    public PackageHandler(BarControl control) {
+        this.control = control;
+    }
 
     @Override
     public IMessage onMessage(PackageMessage message, MessageContext ctx) {
@@ -67,10 +73,6 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                     SPackage.DECODER.decodeSetting(this,dec);
                     //onSetting(dec);
                     break;
-                case Account:
-                    SPackage.DECODER.decodeAccount(this,dec);
-                    // onAccount(dec);
-                    break;
                 case Disable:
                     SPackage.DECODER.decodeDisable(this,dec);
                     // onDisable();
@@ -82,10 +84,6 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                 case UpdateSkill:
                     SPackage.DECODER.decodeUpdateSkill(this,dec);
                     //onUpdateSkill(dec);
-                    break;
-                case Cast:
-                    SPackage.DECODER.decodeCast(this,dec);
-                    //onCast(dec);
                     break;
                 case CoolDown:
                     SPackage.DECODER.decodeCoolDown(this,dec);
@@ -103,12 +101,6 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
                     SPackage.DECODER.decodeCleanUp(this,dec);
                     //onClean(dec);
                     break;
-                case EnterCondition:
-                    SPackage.DECODER.decodeEnterCondition(this,dec);
-                    break;
-                case LeaveCondition:
-                    SPackage.DECODER.decodeLeaveCondition(this,dec);
-                    break;
                 case RemoveSkill:
                     SPackage.DECODER.decodeRemoveSkill(this,dec);
             }
@@ -117,123 +109,90 @@ public class PackageHandler implements IMessageHandler<PackageMessage, IMessage>
     }
 
     @Override
-    public void onDiscover(int version) {
-        PackageSender.send(CPackage.BUILDER.buildDiscover());
+    public void onDiscover() {
+        onCleanUp(CleanType.ALL);
+        onDisable();
+        send(CPackage.BUILDER.buildDiscover());
     }
 
     @Override
-    public void onSetting(int maxSize) {
-        ServerSetting.buildDefault(maxSize);
+    public void onSetting(int maxSize, List<Integer> list) {
+        control.getServerSetting().setMaxPage(maxSize);
+        control.getSkillStore().setSlots(list);
     }
 
     @Override
     public void onEnable() {
-        if (!Manager.isEnable()) {
-            Manager.setEnable(true);
-            Manager manager;
-            synchronized (manager = Manager.getManager()) {
-                if (manager.isListSkill()) PackageSender.send(CPackage.BUILDER.buildListSkill(manager.getSkillKeyList()));
-                if (manager.isListBar()) PackageSender.send(CPackage.BUILDER.buildListBar());
-                if (manager.isActive()) {
-                    Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
-                }
-            }
+        if (control.isValid()) {
+            control.onEnable();
+            Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.enable"))));
         }
     }
 
     @Override
-    public void onAccount(int activeId) {
-        Manager.setActiveId(activeId);
-        Manager.prepareManager(activeId);
-    }
-
-    @Override
-    public void onCleanUp(int activeId) {
-        Manager manager = Manager.getManager(activeId);
-        manager.clear();
+    public void onCleanUp(CleanType type) {
+        switch (type) {
+            case ALL:
+                control.cleanSetting();
+            case SKILL_BAR:
+                control.cleanSkills();
+            case BAR:
+                control.cleanBars();
+                break;
+            default:
+                switch (type) {
+                    case SETTING_SKILL:
+                        control.cleanSetting();
+                    case SKILL:
+                        control.cleanSkills();
+                        break;
+                    default:
+                        switch (type) {
+                            case SETTING_BAR:
+                                control.cleanBars();
+                            case SETTING:
+                                control.cleanSetting();
+                        }
+                }
+        }
     }
 
     @Override
     public void onDisable(){
-        if (Manager.isEnable()){
-            Manager.setEnable(false);
+        if (control.isEnable())
             Minecraft.getMinecraft().addScheduledTask(()-> Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.format("msg.skillbar.disable"))));
-        }
+        control.onDisable();
     }
 
     @Override
-    public void onListSkill(List<SkillInfo> aList) {
-        Manager manager;
-        ArrayList<ForgeSkillInfo> infos = new ArrayList<>();
-        for (SkillInfo info : aList) infos.add(new ForgeSkillInfo(info));
-        synchronized (manager = Manager.getManager()){
-            manager.setSkillMap(infos);
-        }
+    public void onListSkill(List<SkillInfo> aList, List<String> rList) {
+        control.getSkillStore().addSkills(aList);
+        control.getSkillStore().removeSkills(rList);
     }
 
     @Override
     public void onAddSkill(List<SkillInfo> list) {
-        Manager manager;
-        List<ForgeSkillInfo> infos = new ArrayList<>();
-        list.forEach(info -> infos.add(new ForgeSkillInfo(info)));
-        synchronized (manager = Manager.getManager()) {
-            manager.setSkillMap(infos, Collections.emptyList());
-        }
+        control.getSkillStore().addSkills(list);
     }
 
     @Override
     public void onRemoveSkill(List<String> list) {
-        Manager manager;
-        synchronized (manager = Manager.getManager()) {
-            manager.setSkillMap(Collections.emptyList(), list);
-        }
+        control.getSkillStore().removeSkills(list);
     }
 
     @Override
     public void onUpdateSkill(SkillInfo info) {
-        Manager manager = Manager.getManager();
-        if (manager.isActive()){
-            if (info.isExist()) {
-                manager.addSkill(new ForgeSkillInfo(info));
-            } else manager.removeSkill(info.getKey());
-        }
+        control.getSkillStore().updateSkill(info);
     }
 
     @Override
     public void onListBar(Map<Integer, String> map) {
-        Manager manager;
-        synchronized (manager = Manager.getManager()){
-            manager.setBarMap(map,true);
-        }
-    }
-
-    @Override
-    public void onEnterCondition(int size, boolean fix, boolean free, Map<Integer, String> map, List<Integer> freeSlots) {
-        ClientSetting.getInstance().setSize(0);
-        Manager.enterCondition(new Condition(size,fix,free,map,freeSlots));
-        ServerSetting.getInstance().setMaxSize(size);
-    }
-
-    @Override
-    public void onLeaveCondition() {
-        ClientSetting.getInstance().setSize(0);
-        Manager.leaveCondition();
-        ServerSetting.getInstance().setMaxSize(-1);
-    }
-
-    @Override
-    public void onCast(String key, boolean exist, boolean suc) {
-        if (!exist) Manager.getManager().removeSkill(key);
+        control.getSkillStore().setBarSkills(map);
     }
 
     @Override
     public void onCoolDown(Map<String, Integer> map) {
-        Manager manager = Manager.getManager();
-        if (manager.isActive()){
-            HashMap<String, Integer> nMap = new HashMap<>();
-            for (Map.Entry<String, Integer> entry : map.entrySet()) nMap.put(entry.getKey(), entry.getValue());
-            manager.setCoolDown(nMap);
-        }
+        control.getSkillStore().setCooldownMap(map);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.github.MrMks.skillbar.forge.gui;
 
-import com.github.MrMks.skillbar.forge.skill.Manager;
+import com.github.MrMks.skillbar.forge.BarControl;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -9,7 +9,10 @@ import javax.annotation.Nullable;
 
 public class GuiHandler implements IGuiHandler {
 
-    public GuiHandler(){}
+    private final BarControl control;
+    public GuiHandler(BarControl control){
+        this.control = control;
+    }
 
     @Nullable
     @Override
@@ -21,9 +24,8 @@ public class GuiHandler implements IGuiHandler {
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == 2) {
-            Manager manager = Manager.getManager();
-            if (manager.isActive()){
-                return new GuiSkillSettings(new ContainerSkillSetting(manager));
+            if (control.isEnable()){
+                return new GuiSkillSettings(new ContainerSkillSetting(control));
             }
         }
         return null;

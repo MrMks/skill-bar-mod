@@ -28,7 +28,7 @@ public class GuiSkillSettings extends GuiContainer {
     private static final int BAR_BUTTON_UP = 2;
     private static final int BAR_BUTTON_DOWN = 3;
 
-    private ContainerSkillSetting containerSkill;
+    private final ContainerSkillSetting containerSkill;
 
     public GuiSkillSettings(ContainerSkillSetting inventorySlotsIn) {
         super(inventorySlotsIn);
@@ -209,6 +209,7 @@ public class GuiSkillSettings extends GuiContainer {
     }
 
     @Override
+    @ParametersAreNonnullByDefault
     protected void actionPerformed(GuiButton button) throws IOException {
         super.actionPerformed(button);
         switch (button.id){

@@ -1,6 +1,5 @@
 package com.github.MrMks.skillbar.forge.skill;
 
-import com.github.MrMks.skillbar.common.ICondition;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagByte;
@@ -11,17 +10,19 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Deprecated
 public class Manager {
-    private static final HashMap<Integer, Manager> map = new HashMap<>();
-    private static final AtomicInteger activeId = new AtomicInteger(-1);
-    private static final AtomicBoolean enable = new AtomicBoolean(false);
+    //private static final HashMap<Integer, Manager> map = new HashMap<>();
+    //private static final AtomicInteger activeId = new AtomicInteger(-1);
+    //private static final AtomicBoolean enable = new AtomicBoolean(false);
     private static final Manager empty = new Manager(-1){
         @Override
         public boolean isEmpty() {
             return true;
         }
     };
-
+/*
+    @Deprecated
     @Nonnull
     public static Manager getManager(){
         synchronized (map){
@@ -47,13 +48,13 @@ public class Manager {
         activeId.set(id);
         if (id < 0) enable.set(false);
     }
-
+*/
     /*
     public static int getActiveId(){
         return activeId.get();
     }
      */
-
+/*
     public static Manager prepareManager(int id){
         synchronized (map){
             if (id < 0) return empty;
@@ -87,17 +88,17 @@ public class Manager {
     }
 
     //private static List<Integer> freeList = new ArrayList<>();
-
+*/
     private final int id;
-    private final HashMap<String, ForgeSkillInfo> skillMap = new HashMap<>();
-    private final HashMap<Integer, String> barMap = new HashMap<>(9);
-    private final HashMap<String, Integer> cdMap = new HashMap<>(9);
-    private final HashMap<String, ItemStack> iconCache = new HashMap<>(9);
+    //private final HashMap<String, ForgeSkillInfo> skillMap = new HashMap<>();
+    //private final HashMap<Integer, String> barMap = new HashMap<>(9);
+    //private final HashMap<String, Integer> cdMap = new HashMap<>(9);
+    //private final HashMap<String, ItemStack> iconCache = new HashMap<>(9);
 
     private Manager(int id){
         this.id = id;
     }
-
+/*
     public int getId(){
         return id;
     }
@@ -105,11 +106,11 @@ public class Manager {
     public boolean isActive(){
         return !isEmpty() && this.id == activeId.get() && enable.get();
     }
-
+*/
     protected boolean isEmpty(){
         return false;
     }
-
+/*
     public void setSkillMap(List<ForgeSkillInfo> aList, List<? extends CharSequence> reList){
         if (isEmpty()) return;
         synchronized (skillMap){
@@ -170,7 +171,7 @@ public class Manager {
             skillMap.remove(key);
         }
     }
-
+*/
     /*
     public String getSkillDisplayName(String key){
         ForgeSkillInfo info = skillMap.get(key);
@@ -181,12 +182,7 @@ public class Manager {
         }
     }
      */
-
-    /**
-     *
-     * @param nMap new map in selected bar
-     * @return true if nMap have difference form barMap;
-     */
+    /*
     public boolean setBarMap(Map<Integer, String> nMap){
         return setBarMap(nMap,false);
     }
@@ -329,4 +325,6 @@ public class Manager {
         cdMap.clear();
         iconCache.clear();
     }
+
+     */
 }

@@ -11,7 +11,7 @@ public class PackageSender {
     }
 
     public static void send(ByteBuilder builder){
-        send(builder.buildBuf());
+        send(builder.build());
     }
 
     public static void send(ByteBuf buf){

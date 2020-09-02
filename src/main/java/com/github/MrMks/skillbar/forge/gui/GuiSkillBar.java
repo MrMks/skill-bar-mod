@@ -1,9 +1,8 @@
 package com.github.MrMks.skillbar.forge.gui;
 
+import com.github.MrMks.skillbar.forge.BarControl;
 import com.github.MrMks.skillbar.forge.KeyManager;
-import com.github.MrMks.skillbar.forge.setting.ClientSetting;
-import com.github.MrMks.skillbar.forge.setting.ServerSetting;
-import com.github.MrMks.skillbar.forge.skill.Manager;
+import com.github.MrMks.skillbar.forge.SkillStore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiIngame;
@@ -14,44 +13,42 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GuiSkillBar extends GuiIngame {
     private static final String TEXTURE_PATH = "minecraft:textures/gui/widgets.png";
     private static final ResourceLocation TEXTURE = new ResourceLocation(TEXTURE_PATH);
 
-    private FontRenderer fr;
-    private RenderItem ir;
-    public GuiSkillBar(Manager manager){
+    private final FontRenderer fr;
+    private final RenderItem ir;
+    private final List<ItemStack> ics = new ArrayList<>();
+    private final List<Integer> cds = new ArrayList<>();
+    private final String pageStr;
+
+    public GuiSkillBar(BarControl control){
         super(Minecraft.getMinecraft());
         fr = getFontRenderer();
         ir = mc.getRenderItem();
         this.zLevel = -100.0f;
 
-        init(manager, ClientSetting.getInstance().getSize(), ServerSetting.getInstance().getMaxSize());
+        ics.clear();
+        cds.clear();
+        if (control.isEnable()) {
+            SkillStore store = control.getSkillStore();
+            List<ItemStack> icList = store.getBarList(control.getPage());
+            List<Integer> cdList = store.getSkillCooldown(control.getPage());
+            for (int i = 0; i < 9; i++){
+                ics.add(getOrDefault(icList, i, ItemStack.EMPTY));
+                cds.add(getOrDefault(cdList, i, 0));
+            }
+        }
+        pageStr = String.format("(%d/%d)",control.getPage() + 1, control.getServerSetting().getMaxPage() + 1);
     }
 
-    private List<ItemStack> ics = new ArrayList<>();
-    private List<Integer> cds = new ArrayList<>();
-    private String pageStr;
-    private void init(@Nonnull Manager manager, int page, int max){
-        if (manager.isActive()) {
-            ics.clear();
-            cds.clear();
-            Map<Integer, ItemStack> map = manager.getBarIconMap();
-            Map<Integer, Integer> cdMap = manager.getCoolDownMap();
-            for (int i = 0; i < 9; i++){
-                ics.add(map.getOrDefault(i + page * 9, ItemStack.EMPTY));
-                cds.add(cdMap.getOrDefault(i + page * 9, 0));
-            }
-        } else {
-            ics.clear();
-            cds.clear();
-        }
-        pageStr = String.format("(%d/%d)",page + 1, max + 1);
+    private <T> T getOrDefault(List<T> list, int index, T def){
+        T obj = list.get(index);
+        return obj == null ? def : obj;
     }
 
     public void render(ScaledResolution sr){
@@ -119,6 +116,6 @@ public class GuiSkillBar extends GuiIngame {
         ir.zLevel = ir_z;
         GlStateManager.disableRescaleNormal();
         GlStateManager.disableBlend();
-        GlStateManager.enableDepth();;
+        GlStateManager.enableDepth();
     }
 }

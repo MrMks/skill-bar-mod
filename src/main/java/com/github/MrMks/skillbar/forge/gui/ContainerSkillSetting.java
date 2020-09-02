@@ -1,9 +1,9 @@
 package com.github.MrMks.skillbar.forge.gui;
 
 import com.github.MrMks.skillbar.common.pkg.CPackage;
+import com.github.MrMks.skillbar.forge.BarControl;
+import com.github.MrMks.skillbar.forge.SkillStore;
 import com.github.MrMks.skillbar.forge.pkg.PackageSender;
-import com.github.MrMks.skillbar.forge.setting.ServerSetting;
-import com.github.MrMks.skillbar.forge.skill.Manager;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -14,7 +14,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import static com.github.MrMks.skillbar.forge.skill.ForgeSkillInfo.SKILL_KEY;
+import static com.github.MrMks.skillbar.forge.skill.ForgeSkillInfo.LOCKED_KEY;
+
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,20 +27,24 @@ import java.util.Map;
 public class ContainerSkillSetting extends Container {
     private final ItemStackHandler full = new ItemStackHandler(36);
     private final ItemStackHandler slc = new ItemStackHandler(9);
+    // start from 0
     private int pageNow = 0;
+    // start from 0 and should be smaller than barPageMax
     private int barPageNow = 0;
     private final int barPageMax;
     private final List<ItemStack> enabled;
     private final Map<Integer, String> map;
     private final Map<Integer, ItemStack> iconMap;
-    private final Manager manager;
+    private final SkillStore store;
 
-    public ContainerSkillSetting(Manager manager){
-        this.manager = manager;
-        this.enabled = manager.getShowSkillList();
-        this.map = manager.getBarMap();
-        this.iconMap = manager.getBarIconMap();
-        this.barPageMax = ServerSetting.getInstance().getMaxSize();
+    public ContainerSkillSetting(BarControl control) {
+        this.store = control.getSkillStore();
+        this.enabled = store.getShownList();
+        this.map = store.getBarKeyMap();
+        this.iconMap = new HashMap<>();
+        map.forEach((index, key)->iconMap.put(index, store.getIconInBar(index)));
+
+        this.barPageMax = control.getServerSetting().getMaxPage();
         listToFull();
         listToSlc();
         int i;
@@ -57,9 +65,8 @@ public class ContainerSkillSetting extends Container {
 
     @Override
     public void onContainerClosed(EntityPlayer playerIn) {
-        //super.onContainerClosed(playerIn);
         slcToMap();
-        if (manager.setBarMap(map)) {
+        if (store.setBarSkillsClient(map)) {
             PackageSender.send(CPackage.BUILDER.buildSaveBar(map));
         }
     }
@@ -73,7 +80,7 @@ public class ContainerSkillSetting extends Container {
                 Slot slot = this.inventorySlots.get(slotId);
                 ItemStack item = slot.getStack();
                 ItemStack mItem = inventoryPlayer.getItemStack();
-                if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
+                if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey(LOCKED_KEY)) return ItemStack.EMPTY;
                 if (dragType == 1){
                     if (!mItem.isEmpty()){
                         inventoryPlayer.setItemStack(ItemStack.EMPTY);
@@ -99,7 +106,7 @@ public class ContainerSkillSetting extends Container {
                 if (slot != null){
                     ItemStack item = slot.getStack();
                     ItemStack mItem = inventoryPlayer.getItemStack();
-                    if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey("fix")) return ItemStack.EMPTY;
+                    if (item.hasTagCompound() && item.getTagCompound() != null && item.getTagCompound().hasKey(LOCKED_KEY)) return ItemStack.EMPTY;
                     if (dragType == 5){
                         if (!mItem.isEmpty()){
                             inventoryPlayer.setItemStack(ItemStack.EMPTY);
@@ -126,8 +133,8 @@ public class ContainerSkillSetting extends Container {
     public void pageUp(){
         if (canPageUp()){
             pageNow--;
+            listToFull();
         }
-        listToFull();
     }
 
     public boolean canPageUp(){
@@ -137,8 +144,8 @@ public class ContainerSkillSetting extends Container {
     public void pageDown(){
         if (canPageDown()){
             pageNow++;
+            listToFull();
         }
-        listToFull();
     }
 
     public boolean canPageDown(){
@@ -155,9 +162,11 @@ public class ContainerSkillSetting extends Container {
 
 
     public void barPageUp(){
-        slcToMap();
-        barPageNow = Math.max(0, barPageNow - 1);
-        listToSlc();
+        if (canBarPageUp()) {
+            slcToMap();
+            barPageNow = Math.max(0, barPageNow - 1);
+            listToSlc();
+        }
     }
 
     public boolean canBarPageUp(){
@@ -165,9 +174,11 @@ public class ContainerSkillSetting extends Container {
     }
 
     public void barPageDown(){
-        slcToMap();
-        barPageNow = Math.min(barPageMax, barPageNow + 1);
-        listToSlc();
+        if (canBarPageDown()) {
+            slcToMap();
+            barPageNow = Math.min(barPageMax, barPageNow + 1);
+            listToSlc();
+        }
     }
 
     public boolean canBarPageDown(){
@@ -200,13 +211,13 @@ public class ContainerSkillSetting extends Container {
     private void slcToMap(){
         for (int i = 0; i < 9; i ++){
             ItemStack stack = slc.getStackInSlot(i).copy();
-            if (stack.hasTagCompound() && stack.getTagCompound() != null && stack.getTagCompound().hasKey("key")){
-                String key = stack.getTagCompound().getString("key");
+            if (stack.hasTagCompound() && stack.getTagCompound() != null && stack.getTagCompound().hasKey(SKILL_KEY)){
+                String key = stack.getTagCompound().getString(SKILL_KEY);
                 map.put(i + barPageNow * 9, key);
                 iconMap.put(i + barPageNow * 9, stack);
             } else {
                 map.remove(i + barPageNow * 9);
-                if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey("fix")) iconMap.remove(i + barPageNow * 9);
+                if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey(LOCKED_KEY)) iconMap.remove(i + barPageNow * 9);
             }
         }
     }
